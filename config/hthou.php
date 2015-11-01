@@ -7,5 +7,5 @@
  */
 return [
     'local_path' =>  "/",
-    'status_normal' =>  99
+    'status_normal' =>  99,
 ];

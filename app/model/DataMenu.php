@@ -8,4 +8,5 @@ class DataMenu extends Model
 {
     public $timestamps = false;
     protected $table = 'menu';
+
 }

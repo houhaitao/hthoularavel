@@ -11,16 +11,33 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 class menu extends Controller
 {
+    private $url='/admin/menu';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($pid='',$name='')
     {
-        //
-        $list = DataMenu::all();
-        return view('admin.menus',['data'=>$list]);
+        $pagesize = 20;
+        if(!empty($pid))
+        {
+            $backinfo = DataMenu::find($pid);
+            $backid = $backinfo->parentid;
+        }
+        else
+        {
+            $backid=0;
+        }
+        $query = DataMenu::where('parentid',$pid);
+        $query->where('status',Config::get("hthou.status_normal"));
+        if(!empty($name))
+        {
+            $query->where('myname','like','%'.$name.'%');
+        }
+        $query->orderBy('listorder','desc')->orderBy('id','desc');
+        $list = $query->paginate($pagesize);
+        return view('admin.menus',['data'=>$list,'pid'=>$pid,'url'=>$this->url,'backid'=>$backid,'name'=>$name]);
     }
 
     /**
@@ -30,7 +47,6 @@ class menu extends Controller
      */
     public function create()
     {
-
         return view('admin.menus');
     }
 
@@ -48,26 +64,34 @@ class menu extends Controller
             $this->hht_alert('add_menu','danger','请填写菜单名称');
             $this->hht_response_execute();
         }
-        $menu_data = new DataMenu();
-        $menu_data->myname = $data['myname'];
-        $menu_data->parentid = $data['parentid'];
-        $menu_data->image = '';
-        $menu_data->url = $data['url'];
-        $menu_data->target = '';
-        $menu_data->isfolder = 0;
-        $menu_data->isopen = 0;
-        $menu_data->listorder = 0;
-        $menu_data->status = Config::get("hthou.status_normal");
         if(!isset($data['id'])) //添加
         {
+            $menu_data = new DataMenu();
+            $menu_data->myname = $data['myname'];
+            $menu_data->parentid = $data['parentid'];
+            $menu_data->image = '';
+            $menu_data->url = $data['url'];
+            $menu_data->target = '';
+            $menu_data->isfolder = 0;
+            $menu_data->isopen = 0;
+            $menu_data->listorder = 0;
+            $menu_data->status = Config::get("hthou.status_normal");
             $menu_data->save();
+            if(!empty($menu_data->parentid)){
+                $pmenu = DataMenu::find($menu_data->parentid);
+                $pmenu->isfolder = 1;
+                $pmenu->save();
+            }
 
         }
         else //修改
         {
-
+            $menu_data = DataMenu::find($data['id']);
+            $menu_data->myname = $data['myname'];
+            $menu_data->url = $data['url'];
+            $menu_data->save();
         }
-        $this->hht_alert('add_menu','info','我哈哈哈"还是发顺丰"');
+        $this->hht_alert_ok('info','菜单保存成功');
         $this->hht_response_execute();
     }
 
@@ -79,7 +103,51 @@ class menu extends Controller
      */
     public function show($id)
     {
-        //
+        $info = DataMenu::find($id)->toJson();
+        return $info;
+    }
+
+    public function delete(Request $request)
+    {
+        $data = $request->input();
+        if(isset($data['id']) && is_array($data['id']))
+        {
+            foreach($data['id'] as $id)
+            {
+                $info = DataMenu::find($id);
+                $info->status=0;
+                $info->save();
+                $pid = $info->parentid;
+            }
+            if($pid > 0)
+            {
+                $chilrens = DataMenu::where('parentid',$pid)->where('status',Config::get("hthou.status_normal"))->count();
+                if($chilrens <= 0 )
+                {
+                    $pinfo = DataMenu::find($pid);
+                    $pinfo->isfolder=0;
+                    $pinfo->save();
+                }
+            }
+        }
+        $this->hht_alert_ok('info','删除成功');
+        $this->hht_response_execute();
+    }
+
+    public function listorder(Request $request)
+    {
+        $data = $request->input();
+        if(isset($data['listorder']) && is_array($data['listorder']))
+        {
+            foreach($data['listorder'] as $id=>$order)
+            {
+                $info = DataMenu::find($id);
+                $info->listorder=$order;
+                $info->save();
+            }
+        }
+        $this->hht_alert_ok('info','排序成功');
+        $this->hht_response_execute();
     }
 
     /**
@@ -114,5 +182,13 @@ class menu extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $data = $request->input();
+        $url = $this->url.'/p/'.$data['pid'].'/name/'.urlencode($data['name']);
+        $this->hht_redirect($url);
+        $this->hht_response_execute();
     }
 }

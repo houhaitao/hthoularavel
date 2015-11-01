@@ -28,15 +28,13 @@
                     <div class="clear"></div>
                 </div>
                 <div class="box-content">
-                    <form role="form" >
+                    <form role="form" method="post" action="{{$url}}/search" onsubmit="return r_submit(this)">
                         <div class="col-md-12">
                             <div class="form-group col-md-4">
-                                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                                <input type="text" name="name" value="{{$name}}" class="form-control" id="exampleInputEmail1" placeholder="菜单名称" />
+                                <input type="hidden" name="pid" value="{{$pid}}" />
+                                <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                             </div>
-                            <div class="form-group  col-md-4">
-                                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                            </div>
-
                             <div class="form-group col-md-4">
                                 <label for="exampleInputPassword1">&nbsp;</label>
                                 <button type="submit" class="btn btn-default">Submit</button>
@@ -69,11 +67,11 @@
                 </div>
                 <div class="box-content">
                     <div class="alert alert-info displaynone"></div>
-                    <form action="">
+                    <form action="" name="form1" method="post"  onsubmit="return r_submit(this)">
                         <table class="table table-striped table-bordered">
                             <thead>
                             <tr>
-                                <th><input type="checkbox"/></th>
+                                <th><input type="checkbox" id="checkall" children="ck"/></th>
                                 <th>排序</th>
                                 <th>菜单名称</th>
                                 <th>菜单地址</th>
@@ -84,13 +82,13 @@
                             <tbody>
                             @foreach($data as $r)
                             <tr>
-                                <td><input type="checkbox" name="id[]" value="{{$r->id}}}"/></td>
-                                <td><input size="4" value="{{$r->listorder}}" type="text"/></td>
-                                <td>{{$r->myname}}</td>
+                                <td><input type="checkbox" name="id[]" class="ck" value="{{$r->id}}"/></td>
+                                <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
+                                <td><a href="{{$url}}/p/{{$r->id}}">{{$r->myname}}</a></td>
                                 <td class="center">@if(!empty($r->url)){{$r->url}}@else空@endif</td>
-                                <td class="center">@if($r->isfold=='0')链接@else目录@endif</td>
+                                <td class="center">@if($r->isfolder=='0')链接@else目录@endif</td>
                                 <td class="center">
-                                    <a class="btn btn-info" href="#">
+                                    <a class="btn btn-info menu_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                         修改
                                     </a>
@@ -103,21 +101,16 @@
                         </table>
                         <div>
                             <div class="col-md-4">
-                                <input type="submit" class="btn btn-danger" value="删除"/>&nbsp;
-                                <input type="submit" class="btn btn-default" value="排序"/>&nbsp;
+                                <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
+                                <input type="button" onclick="change_opt('form1','{{$url}}/delete')" class="btn btn-danger" value="删除"/>&nbsp;
+                                <input type="button" onclick="change_opt('form1','{{$url}}/listorder')" class="btn btn-default" value="排序"/>&nbsp;
                                 <input type="button" id="op_add_form" class="btn btn-success" value="添加"/>
+                                @if(!empty($pid))
+                                <input type="button" class="btn btn-info" onclick="self.location='{{$url}}/p/{{$backid}}'" value="返回"/>
+                                @endif
                             </div>
                             <div class="col-md-8 no-padding no-margin myright">
-                                <ul class="pagination pagination-centered">
-                                    <li><a href="#">Prev</a></li>
-                                    <li class="active">
-                                        <a href="#">1</a>
-                                    </li>
-                                    <li><a href="#">2</a></li>
-                                    <li><a href="#">3</a></li>
-                                    <li><a href="#">4</a></li>
-                                    <li><a href="#">Next</a></li>
-                                </ul>
+                                {!! $data->render() !!}
                             </div>
                             <div class="clear"></div>
                         </div>
@@ -137,13 +130,14 @@
                         <button type="button" class="close" data-dismiss="modal">×</button>
                         <h3>添加菜单</h3>
                     </div>
+                        <input type="hidden" name="parentid" value="{{$pid}}">
                     <div class="modal-body">
                         <div id="add_menu" class="alert alert-info displaynone"></div>
                         <div class="form-group col-md-12">
-                            <input type="text" class="form-control" name="myname" placeholder="菜单名称">
+                            <input type="text" class="form-control" id="form_myname" name="myname" placeholder="菜单名称">
                         </div>
                         <div class="form-group col-md-12">
-                            <input type="text" class="form-control" name="url" placeholder="菜单地址">
+                            <input type="text" class="form-control" id="form_url" name="url" placeholder="菜单地址">
                         </div>
                         <div class="clear"></div>
                     </div>
@@ -152,6 +146,24 @@
                         <input type="submit" value="提交" class="btn btn-primary">
                     </div>
                     </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="mydialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+
+                        <div class="modal-body">
+                            <div id="my_dd" class="alert alert-info"></div>
+
+                            <div class="clear"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" onclick="self.location=self.location" id="button" value="确定" class="btn btn-primary">
+                        </div>
                 </div>
             </div>
         </div>

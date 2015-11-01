@@ -118,10 +118,10 @@ function my_request(r_url,msg)
     }
 }
 
-function self_ref()
+function self_ref(time)
 {
-
-    self.location = self.location;
+    var mytime = time * 1000;
+    setTimeout("self.location = self.location", mytime );
 }
 
 function my_alert(id,type,text)
@@ -129,6 +129,15 @@ function my_alert(id,type,text)
     $("#"+id).removeClass();
     $("#"+id).addClass("alert alert-"+type);
     $("#"+id).html(text);
+}
+
+function div_su_alert(type,text)
+{
+    $('#myModal').modal('hide');
+    $('#mydialog').modal('show');
+    $("#my_dd").removeClass();
+    $("#my_dd").addClass("alert alert-"+type);
+    $("#my_dd").html(text);
 }
 
 function clear_alert()

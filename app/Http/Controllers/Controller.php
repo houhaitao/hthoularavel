@@ -18,10 +18,18 @@ abstract class Controller extends BaseController
         $text = str_replace(array("'",'"'),array("\\'",'\\\"'),$text);
         $this->hht_response .= "my_alert(\\'{$id}\\',\\'{$type}\\',\\'{$text}\\');";
     }
-    function hht_ref()
+
+    function hht_alert_ok($type,$text)
     {
         $this->flag=false;
-        $this->hht_response.="self_ref();";
+        $text = str_replace(array("'",'"'),array("\\'",'\\\"'),$text);
+        $this->hht_response .= "div_su_alert(\\'{$type}\\',\\'{$text}\\');";
+    }
+
+    function hht_ref($time)
+    {
+        $this->flag=false;
+        $this->hht_response.="self_ref({$time});";
     }
     function hht_redirect($url)
     {
