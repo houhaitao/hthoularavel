@@ -24,7 +24,10 @@ Route::group(['prefix'=>'admin'],function(){
 
     Route::group(['prefix'=>'menu'],function(){
         Route::resource('/','admin\menu');
+        Route::get('ajaxMenuTree','admin\menu@ajaxMenuTree');
+        Route::get('ajaxMenuPath/{id}','admin\menu@ajaxMenuPath');
         Route::get('{id}','admin\menu@show');
+
         /**
          * 菜单列表
          */
@@ -38,6 +41,25 @@ Route::group(['prefix'=>'admin'],function(){
         Route::post('listorder','admin\menu@listorder');
     });
 
+    /**
+     * 管理员
+     */
+    Route::group(['prefix'=>'manager'],function(){
+        Route::resource('/','admin\manager');
+        Route::get('{id}','admin\manager@show');
+
+        /**
+         * 管理员搜索列表
+         */
+        Route::get('name/{name?}','admin\manager@index');
+
+        Route::post('search','admin\manager@search');
+        Route::post('delete','admin\manager@delete');
+    });
+
 });
+
+
+
 
 

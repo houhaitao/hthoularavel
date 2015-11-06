@@ -69,7 +69,7 @@ class menu extends Controller
             $menu_data = new DataMenu();
             $menu_data->myname = $data['myname'];
             $menu_data->parentid = $data['parentid'];
-            $menu_data->image = '';
+            $menu_data->image = $data['image'];
             $menu_data->url = $data['url'];
             $menu_data->target = '';
             $menu_data->isfolder = 0;
@@ -89,6 +89,7 @@ class menu extends Controller
             $menu_data = DataMenu::find($data['id']);
             $menu_data->myname = $data['myname'];
             $menu_data->url = $data['url'];
+            $menu_data->image = $data['image'];
             $menu_data->save();
         }
         $this->hht_alert_ok('info','菜单保存成功');
@@ -190,5 +191,19 @@ class menu extends Controller
         $url = $this->url.'/p/'.$data['pid'].'/name/'.urlencode($data['name']);
         $this->hht_redirect($url);
         $this->hht_response_execute();
+    }
+
+    public function ajaxMenuTree()
+    {
+        $tree = array();
+        DataMenu::get_menu_tree($tree);
+        return json_encode($tree);
+    }
+
+    public function ajaxMenuPath($id)
+    {
+        $path = array();
+        DataMenu::get_menu_path($path,$id);
+        return json_encode($path);
     }
 }

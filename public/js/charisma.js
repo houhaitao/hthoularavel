@@ -115,8 +115,14 @@ $(document).ready(function () {
         e.preventDefault();
         var $ul = $(this).siblings('ul');
         var $li = $(this).parent();
-        if ($ul.is(':visible')) $li.removeClass('active');
-        else                    $li.addClass('active');
+        if ($ul.is(':visible'))
+            $li.removeClass('active');
+        else
+        {
+            $li.addClass('active');
+            var value = $(this).attr("vardata");
+            $.cookie('currentMenu',value);
+        }
         $ul.slideToggle();
     });
 

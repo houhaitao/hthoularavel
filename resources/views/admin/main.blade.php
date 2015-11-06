@@ -140,48 +140,10 @@
                     <div class="nav-sm nav nav-stacked">
 
                     </div>
-                    <ul class="nav nav-pills nav-stacked main-menu">
-                        <li class="nav-header">Main</li>
-                        <li><a class="ajax-link" href="index.html"><i class="glyphicon glyphicon-home"></i><span> Dashboard</span></a>
-                        </li>
-                        <li><a class="ajax-link" href="ui.html"><i class="glyphicon glyphicon-eye-open"></i><span> UI Features</span></a>
-                        </li>
-                        <li><a class="ajax-link" href="form.html"><i
-                                        class="glyphicon glyphicon-edit"></i><span> Forms</span></a></li>
-                        <li><a class="ajax-link" href="chart.html"><i class="glyphicon glyphicon-list-alt"></i><span> Charts</span></a>
-                        </li>
-                        <li><a class="ajax-link" href="typography.html"><i class="glyphicon glyphicon-font"></i><span> Typography</span></a>
-                        </li>
-                        <li><a class="ajax-link" href="gallery.html"><i class="glyphicon glyphicon-picture"></i><span> Gallery</span></a>
-                        </li>
-                        <li class="nav-header hidden-md">Sample Section</li>
-                        <li><a class="ajax-link" href="table.html"><i
-                                        class="glyphicon glyphicon-align-justify"></i><span> Tables</span></a></li>
-                        <li class="accordion">
-                            <a href="#"><i class="glyphicon glyphicon-plus"></i><span> Accordion Menu</span></a>
-                            <ul class="nav nav-pills nav-stacked">
-                                <li class="accordion"><a href="#"><i class="glyphicon glyphicon-plus"></i><span> Child Menu 1</span></a>
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li><a href="#">Child Menu 1-1</a>
-                                        <li><a href="#">Child Menu 2-1</a>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Child Menu 2</a></li>
-                            </ul>
-                        </li>
-                        <li><a class="ajax-link" href="calendar.html"><i class="glyphicon glyphicon-calendar"></i><span> Calendar</span></a>
-                        </li>
-                        <li><a class="ajax-link" href="grid.html"><i
-                                        class="glyphicon glyphicon-th"></i><span> Grid</span></a></li>
-                        <li><a href="tour.html"><i class="glyphicon glyphicon-globe"></i><span> Tour</span></a></li>
-                        <li><a class="ajax-link" href="icon.html"><i
-                                        class="glyphicon glyphicon-star"></i><span> Icons</span></a></li>
-                        <li><a href="error.html"><i class="glyphicon glyphicon-ban-circle"></i><span> Error Page</span></a>
-                        </li>
-                        <li><a href="login.html"><i class="glyphicon glyphicon-lock"></i><span> Login Page</span></a>
-                        </li>
+                    <ul class="nav nav-pills nav-stacked main-menu admin-left-menu">
+
                     </ul>
-                    <label id="for-is-ajax" for="is-ajax"><input id="is-ajax" type="checkbox"> Ajax on menu</label>
+
                 </div>
             </div>
         </div>
@@ -248,6 +210,75 @@
 <!-- application script for Charisma demo -->
 <script src="/js/hthou.js"></script>
 
+<script src="/js/charisma.js"></script>
+<script>
+    $.get(menu_url+"ajaxMenuTree",function(data){
+        var menu_data = JSON.parse(data);
+        var html = "<li class=\"nav-header\">主菜单</li>";
+        var size = menu_data.length;
+        var index=0;
+        var tmp1_obj;
+        var menu_img;
+        var current_menu = $.cookie("currentMenu");
+        var menu_tree;
+
+        for(index=0;index<size;index++)
+        {
+            tmp1_obj = menu_data[index];
+            menu_img = (tmp1_obj.info.image=='' || tmp1_obj.info.image==null) ? 'home' : tmp1_obj.info.image;
+            if(tmp1_obj.c=='1')
+            {
+                html += "<li><a class=\"ajax-link\" href=\""+tmp1_obj.info.url+"\"><i class=\"glyphicon";
+                html += " glyphicon-"+menu_img+"\"></i><span>"+tmp1_obj.info.myname+"</span></a></li>";
+            }
+            else
+            {
+                html += "<li class=\"accordion\">";
+                html += "<a href=\"#\" vardata=\""+tmp1_obj.info.id+"\"><i class=\"glyphicon glyphicon-"+menu_img+"\"></i><span>"+tmp1_obj.info.myname+"</span></a>";
+                html += "<ul class=\"nav nav-pills nav-stacked\">";
+                html += make_sub_menu(tmp1_obj.c);
+                html+= "</ul></li>";
+            }
+        }
+        $(".admin-left-menu").html(html);
+        if(current_menu != undefined || current_menu != null || current_menu !=='')
+        {
+            $.get(menu_url+"ajaxMenuPath/"+current_menu,function(path_data){
+                menu_tree = JSON.parse(path_data);
+                size = menu_tree.length;
+                for(index=0;index<size;index++)
+                {
+                    $("[vardata='"+menu_tree[index]+"']").parent().addClass('active');
+                    $("[vardata='"+menu_tree[index]+"']").siblings('ul').slideToggle();;
+                }
+                $('.accordion li.active:first').parents('ul').slideDown();
+            });
+        }
+
+        $('.accordion > a').click(function (e) {
+            e.preventDefault();
+            var $ul = $(this).siblings('ul');
+            var $li = $(this).parent();
+            if ($ul.is(':visible'))
+                $li.removeClass('active');
+            else
+            {
+                $li.siblings('li').removeClass('active');
+                $li.siblings('li').children('ul').slideUp();
+                $li.addClass('active');
+                var value = $(this).attr("vardata");
+                $.cookie('currentMenu',value);
+            }
+            $ul.slideToggle();
+        });
+
+        //$('.accordion li.active:first').parents('ul').slideDown();
+
+
+        //other things to do on document ready, separated for ajax calls
+        docReady();
+    });
+</script>
 
 </body>
 </html>
