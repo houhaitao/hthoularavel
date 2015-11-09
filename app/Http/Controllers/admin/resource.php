@@ -5,30 +5,23 @@ namespace App\Http\Controllers\admin;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\model\DataManager;
+use App\model\DataResource;
 use Illuminate\Support\Facades\Config;
-
-class manager extends Controller
+class resource extends Controller
 {
-    private $url='/admin/manager';
+    private $url='/admin/resource';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($name='')
+    public function index()
     {
         //
         $pagesize = 20;
-
-        $query = DataManager::where('status',Config::get("hthou.status_normal"));
-        if(!empty($name))
-        {
-            $query->where('username',$name);
-        }
-        $query->orderBy('id','asc');
+        $query = DataResource::orderBy('listorder','desc');
         $list = $query->paginate($pagesize);
-        return view('admin.managers',['data'=>$list,'url'=>$this->url,'name'=>$name]);
+        return view('admin.resources',['data'=>$list,'url'=>$this->url]);
     }
 
     /**
@@ -54,53 +47,55 @@ class manager extends Controller
 
         if(!isset($data['id'])) //添加
         {
-            if(empty($data['username']))
+            if(empty($data['name']))
             {
-                $this->hht_alert('add_manager','danger','请填写用户名');
+                $this->hht_alert('add_resource','danger','请填写资源名称');
                 $this->hht_response_execute();
             }
-            if(empty($data['password']))
+            if(empty($data['view_type']))
             {
-                $this->hht_alert('add_manager','danger','请填写用密码');
+                $this->hht_alert('add_resource','danger','请填写编码');
                 $this->hht_response_execute();
             }
-            if($data['password'] != $data['repassword'])
+            if(empty($data['res_sql']))
             {
-                $this->hht_alert('add_manager','danger','两次密码输入不一致');
+                $this->hht_alert('add_resource','danger','请填写sql');
                 $this->hht_response_execute();
             }
-            $manager_data = new DataManager();
-            $userinfo = $manager_data->getUserByUsername($data['username']);
-            if($userinfo != false)
-            {
-                $this->hht_alert('add_manager','danger','该用户名已存在，请更换用户名');
-                $this->hht_response_execute();
-            }
-            $manager_data->username = $data['username'];
-            $manager_data->password = $manager_data->password_encode($data['password']);
-            $manager_data->nickname = $data['nickname'];
-            $manager_data->usertype = $data['usertype'];
-            $manager_data->status = Config::get("hthou.status_normal");
-            $manager_data->addtime = time();
-            $manager_data->save();
+
+            $resource_data = new DataResource();
+
+            $resource_data->name = $data['name'];
+            $resource_data->view_type = $data['view_type'];
+            $resource_data->res_sql = $data['res_sql'];
+            $resource_data->listorder = 0;
+            $resource_data->save();
         }
         else //修改
         {
-            if(!empty($data['password']) && $data['password'] != $data['repassword'])
+            if(empty($data['name']))
             {
-                $this->hht_alert('add_manager','danger','两次密码输入不一致');
+                $this->hht_alert('add_resource','danger','请填写资源名称');
                 $this->hht_response_execute();
             }
-            $manager_data = DataManager::find($data['id']);
-            if(!empty($data['password']))
+            if(empty($data['view_type']))
             {
-                $manager_data->password = $manager_data->password_encode($data['password']);
+                $this->hht_alert('add_resource','danger','请填写编码');
+                $this->hht_response_execute();
             }
-            $manager_data->nickname = $data['nickname'];
+            if(empty($data['res_sql']))
+            {
+                $this->hht_alert('add_resource','danger','请填写sql');
+                $this->hht_response_execute();
+            }
+            $resource_data = DataResource::find($data['id']);
+            $resource_data->name = $data['name'];
+            $resource_data->view_type = $data['view_type'];
+            $resource_data->res_sql = $data['res_sql'];
 
-            $manager_data->save();
+            $resource_data->save();
         }
-        $this->hht_alert_ok('info','管理员信息保存成功');
+        $this->hht_alert_ok('info','数据资源保存成功');
         $this->hht_response_execute();
     }
 
@@ -112,7 +107,8 @@ class manager extends Controller
      */
     public function show($id)
     {
-        $info = DataManager::find($id)->toJson();
+        //
+        $info = DataResource::find($id)->toJson();
         return $info;
     }
 
@@ -157,19 +153,27 @@ class manager extends Controller
         {
             foreach($data['id'] as $id)
             {
-                $info = DataManager::find($id);
-                $info->status=0;
-                $info->save();
+                $info = DataResource::find($id);
+                $info->delete();
             }
         }
         $this->hht_alert_ok('info','删除成功');
         $this->hht_response_execute();
     }
-    public function search(Request $request)
+
+    public function listorder(Request $request)
     {
         $data = $request->input();
-        $url = $this->url.'/name/'.urlencode($data['name']);
-        $this->hht_redirect($url);
+        if(isset($data['listorder']) && is_array($data['listorder']))
+        {
+            foreach($data['listorder'] as $id=>$order)
+            {
+                $info = DataResource::find($id);
+                $info->listorder=$order;
+                $info->save();
+            }
+        }
+        $this->hht_alert_ok('info','排序成功');
         $this->hht_response_execute();
     }
 }

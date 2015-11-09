@@ -57,6 +57,19 @@ Route::group(['prefix'=>'admin'],function(){
         Route::post('delete','admin\manager@delete');
     });
 
+    /**
+     * 数据资源
+     */
+    Route::group(['prefix'=>'resource'],function(){
+        Route::resource('/','admin\resource');
+        Route::get('{id}','admin\resource@show');
+
+
+
+        Route::post('listorder','admin\resource@listorder');
+        Route::post('delete','admin\resource@delete');
+    });
+
 });
 
 
