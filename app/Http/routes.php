@@ -25,16 +25,8 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'menu'],function(){
         Route::resource('/','admin\menu');
         Route::get('ajaxMenuTree','admin\menu@ajaxMenuTree');
-        Route::get('ajaxMenuPath/{id}','admin\menu@ajaxMenuPath');
-        Route::get('{id}','admin\menu@show');
-
-        /**
-         * 菜单列表
-         */
-        Route::group(['prefix'=>'p/{id}'],function(){
-            Route::get('/','admin\menu@index');
-            Route::get('name/{name?}','admin\menu@index');
-        });
+        Route::get('ajaxMenuPath/{id}','admin\menu@ajaxMenuPath')->where('id','[0-9]+');
+        Route::get('{id}','admin\menu@show')->where('id','[0-9]+');
 
         Route::post('search','admin\menu@search');
         Route::post('delete','admin\menu@delete');
@@ -46,7 +38,7 @@ Route::group(['prefix'=>'admin'],function(){
      */
     Route::group(['prefix'=>'manager'],function(){
         Route::resource('/','admin\manager');
-        Route::get('{id}','admin\manager@show');
+        Route::get('{id}','admin\manager@show')->where('id','[0-9]+');
 
         /**
          * 管理员搜索列表
@@ -62,12 +54,27 @@ Route::group(['prefix'=>'admin'],function(){
      */
     Route::group(['prefix'=>'resource'],function(){
         Route::resource('/','admin\resource');
-        Route::get('{id}','admin\resource@show');
+        Route::get('{id}','admin\resource@show')->where('id','[0-9]+');
 
 
 
         Route::post('listorder','admin\resource@listorder');
         Route::post('delete','admin\resource@delete');
+    });
+
+    /**
+     * 分类管理
+     */
+
+    Route::group(['prefix'=>'type'],function(){
+        Route::resource('/','admin\type');
+        Route::get('{id}','admin\type@show')->where('id','[0-9]+');
+
+        
+
+        Route::post('search','admin\type@search');
+        Route::post('delete','admin\type@delete');
+        Route::post('listorder','admin\type@listorder');
     });
 
 });

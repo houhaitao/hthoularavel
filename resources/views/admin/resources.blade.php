@@ -126,6 +126,51 @@
 
         <!-- content ends -->
     </div><!--/#content.col-md-0-->
+    <script>
+        var resource_url = '/admin/resource/';
+        $(document).ready(function () {
+            /**
+             * 数据资源管理
+             */
+            $("#op_add_form_resource").click(function(e){
+                e.preventDefault();
+                $("#form_name").val("");
+                $("#form_view_type").val("");
+                $("#form_res_sql").val("");
+                if($("#form_id").val() != undefined)
+                {
+                    $("#form_id").remove();
+                }
 
+                $("#add_resource").addClass("displaynone");
+                $('#myModal').modal('show');
+
+            });
+
+            $(".resource_mod").click(function(e){
+                var id_str = $(this).attr('id');
+                var id = id_str.replace('mod_','');
+                var url = resource_url+id;
+                $.get(url, function(result){
+                    var myobj = JSON.parse(result);
+                    $("#form_name").val(myobj.name);
+                    $("#form_view_type").val(myobj.view_type);
+                    $("#form_res_sql").val(myobj.res_sql);
+
+                    if($("#form_id").val() == undefined)
+                    {
+                        $("#form_res_sql").after("<input type=\"hidden\" name=\"id\" id=\"form_id\" value=\""+myobj.id+"\">");
+                    }
+                    else
+                    {
+                        $("#form_id").val(id);
+                    }
+                    $("#add_resource").addClass("displaynone");
+                    $('#myModal').modal('show');
+
+                });
+            });
+        });
+    </script>
 
 @endsection

@@ -9,7 +9,10 @@ use App\model\DataResource;
 use Illuminate\Support\Facades\Config;
 class resource extends Controller
 {
-    private $url='/admin/resource';
+    public function __construct()
+    {
+        $this->url = '/admin/resource';
+    }
     /**
      * Display a listing of the resource.
      *

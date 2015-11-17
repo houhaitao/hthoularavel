@@ -144,7 +144,6 @@ class RouteCollection implements Countable, IteratorAggregate
         // method. If we can, great, we can just return it so that it can be called
         // by the consumer. Otherwise we will check for routes with another verb.
         $route = $this->check($routes, $request);
-
         if (! is_null($route)) {
             return $route->bind($request);
         }
@@ -230,6 +229,7 @@ class RouteCollection implements Countable, IteratorAggregate
     protected function check(array $routes, $request, $includingMethod = true)
     {
         return Arr::first($routes, function ($key, $value) use ($request, $includingMethod) {
+
             return $value->matches($request, $includingMethod);
         });
     }

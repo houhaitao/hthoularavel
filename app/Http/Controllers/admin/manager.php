@@ -10,15 +10,20 @@ use Illuminate\Support\Facades\Config;
 
 class manager extends Controller
 {
-    private $url='/admin/manager';
+    public function __construct()
+    {
+        $this->url = '/admin/manager';
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($name='')
+    public function index(Request $request)
     {
         //
+        $data = $request->input();
+        $name = isset($data['name']) ? $data['name'] : '';
         $pagesize = 20;
 
         $query = DataManager::where('status',Config::get("hthou.status_normal"));
@@ -168,7 +173,7 @@ class manager extends Controller
     public function search(Request $request)
     {
         $data = $request->input();
-        $url = $this->url.'/name/'.urlencode($data['name']);
+        $url = $this->hht_make_search_url($data,'name');
         $this->hht_redirect($url);
         $this->hht_response_execute();
     }

@@ -216,7 +216,6 @@ class Route
             if (! $includingMethod && $validator instanceof MethodValidator) {
                 continue;
             }
-
             if (! $validator->matches($this, $request)) {
                 return false;
             }

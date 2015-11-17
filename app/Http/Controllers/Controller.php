@@ -12,6 +12,28 @@ abstract class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     protected $hht_response;
     protected $flag;
+    protected $url;
+
+    function hht_make_search_url($data,$encode='')
+    {
+        $url = $this->url;
+        $encode = explode(',',$encode);
+        unset($data['_token']);
+        unset($data['edufepm']);
+        $url_data = array();
+        if(sizeof($data) > 0)
+        {
+            $url .= '?';
+            foreach($data as $k=>$v)
+            {
+                $value = in_array($k,$encode) ? urlencode($v) : $v;
+                $url_data[] = $k.'='.$value;
+            }
+            $url .= implode('&',$url_data);
+        }
+        return $url;
+    }
+
     function hht_alert($id,$type,$text)
     {
         $this->flag=false;

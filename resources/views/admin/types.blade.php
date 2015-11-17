@@ -1,5 +1,5 @@
 @extends('admin.main')
-@section('title','菜单管理')
+@section('title','分类管理')
 @section('content')
 
 
@@ -22,7 +22,7 @@
                     <form role="form" method="post" action="{{$url}}/search" onsubmit="return r_submit(this)">
                         <div class="col-md-12">
                             <div class="form-group col-md-4">
-                                <input type="text" name="name" value="{{$name}}" class="form-control" id="exampleInputEmail1" placeholder="菜单名称" />
+                                <input type="text" name="name" value="{{$name}}" class="form-control" id="exampleInputEmail1" placeholder="分类名称" />
                                 <input type="hidden" name="pid" value="{{$pid}}" />
                                 <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                             </div>
@@ -47,7 +47,7 @@
         <div class="box col-md-12">
             <div class="box-inner">
                 <div class="box-header well" data-original-title="">
-                    <h2><i class="glyphicon glyphicon-user"></i> 菜单管理</h2>
+                    <h2><i class="glyphicon glyphicon-user"></i> 分类管理</h2>
 
                     <div class="box-icon">
 
@@ -64,9 +64,9 @@
                             <tr>
                                 <th><input type="checkbox" id="checkall" children="ck"/></th>
                                 <th>排序</th>
-                                <th>菜单名称</th>
-                                <th>菜单地址</th>
-                                <th>菜单类型</th>
+                                <th>分类编号</th>
+                                <th>分类名称</th>
+                                <th>分类别名</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
@@ -75,11 +75,12 @@
                             <tr>
                                 <td><input type="checkbox" name="id[]" class="ck" value="{{$r->id}}"/></td>
                                 <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
-                                <td><a href="{{$url}}/?pid={{$r->id}}">{{$r->myname}}</a></td>
-                                <td class="center">@if(!empty($r->url)){{$r->url}}@else空@endif</td>
-                                <td class="center">@if($r->isfolder=='0')链接@else目录@endif</td>
+                                <td>{{$r->type_code}}</td>
+                                <td><a href="{{$url}}/?pid={{$r->type_code}}">{{$r->type_name}}</a></td>
+                                <td class="center">@if(!empty($r->alias)){{$r->alias}}@else空@endif</td>
+
                                 <td class="center">
-                                    <a class="btn btn-info menu_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
+                                    <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                         修改
                                     </a>
@@ -97,7 +98,7 @@
                                 <input type="button" onclick="change_opt('form1','{{$url}}/listorder')" class="btn btn-default" value="排序"/>&nbsp;
                                 <input type="button" id="op_add_form" class="btn btn-success" value="添加"/>
                                 @if(!empty($pid))
-                                <input type="button" class="btn btn-info" onclick="self.location='{{$url}}/?pid{{$backid}}'" value="返回"/>
+                                <input type="button" class="btn btn-info" onclick="self.location='{{$url}}/?pid={{$backid}}'" value="返回"/>
                                 @endif
                             </div>
                             <div class="col-md-8 no-padding no-margin myright">
@@ -114,24 +115,27 @@
 
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{Config::get('hthou.local_path')}}admin/menu" name="add_form" method="post"
+                    <form action="{{Config::get('hthou.local_path')}}admin/type" name="add_form" method="post"
                           onsubmit="return r_submit(this)">
                         <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">×</button>
-                        <h3>添加菜单</h3>
+                        <h3>添加分类</h3>
                     </div>
                         <input type="hidden" name="parentid" value="{{$pid}}">
                     <div class="modal-body">
-                        <div id="add_menu" class="alert alert-info displaynone"></div>
-                        <div class="form-group col-md-12">
-                            <input type="text" class="form-control" id="form_myname" name="myname" placeholder="菜单名称">
+                        <div id="add_message" class="alert alert-info displaynone"></div>
+                        <div class="form-group col-md-12 typecode">
+                            <input type="text" class="form-control" id="form_type_code" name="type_code"
+                                   placeholder="分类编号">
                         </div>
                         <div class="form-group col-md-12">
-                            <input type="text" class="form-control" id="form_url" name="url" placeholder="菜单地址">
+                            <input type="text" class="form-control" id="form_type_name" name="type_name"
+                                   placeholder="分类名称">
                         </div>
+                        <input type="hidden" name="parent_code" value="{{$pid}}"/>
                         <div class="form-group col-md-12">
-                            <input type="text" class="form-control" id="form_image" name="image" placeholder="菜单图标">
+                            <input type="text" class="form-control" id="form_alias" name="alias" placeholder="分类别名">
                         </div>
                         <div class="clear"></div>
                     </div>
@@ -165,44 +169,52 @@
 
         <!-- content ends -->
     </div><!--/#content.col-md-0-->
-
     <script>
-        var menu_url = '/admin/menu/';
+        var type_url = '/admin/type/';
         $(document).ready(function () {
-
-            //菜单管理js
-            $("#op_add_form").click(function (e) {
+            /**
+             * 分类管理
+             */
+            $("#op_add_form").click(function(e){
                 e.preventDefault();
-                $("#form_myname").val("");
-                $("#form_url").val("");
-                $("#form_image").val("");
-                if ($("#form_id").val() != undefined) {
+                $(".typecode").html("<input type=\"text\" class=\"form-control\" id=\"form_type_code\" name=\"type_code\" placeholder=\"分类编号\">");
+                $("#form_type_code").val("");
+                $("#form_type_name").val("");
+                $("#form_alias").val("");
+                if($("#form_id").val() != undefined)
+                {
                     $("#form_id").remove();
                 }
-                $("#add_menu").addClass("displaynone");
+
+                $("#add_resource").addClass("displaynone");
                 $('#myModal').modal('show');
 
             });
-            $(".menu_mod").click(function (e) {
+
+            $(".data_mod").click(function(e){
                 var id_str = $(this).attr('id');
-                var id = id_str.replace('mod_', '');
-                var url = menu_url + id;
-                $.get(url, function (result) {
+                var id = id_str.replace('mod_','');
+                var url = type_url+id;
+                $.get(url, function(result){
                     var myobj = JSON.parse(result);
-                    $("#form_myname").val(myobj.myname);
-                    $("#form_url").val(myobj.url);
-                    $("#form_image").val(myobj.image);
-                    if ($("#form_id").val() == undefined) {
-                        $("#form_url").after("<input type=\"hidden\" name=\"id\" id=\"form_id\" value=\"" + myobj.id + "\">");
+                    $(".typecode").html("分类编号："+myobj.type_code);
+                    $("#form_type_name").val(myobj.type_name);
+                    $("#form_alias").val(myobj.alias);
+
+                    if($("#form_id").val() == undefined)
+                    {
+                        $("#form_alias").after("<input type=\"hidden\" name=\"id\" id=\"form_id\" value=\""+myobj.id+"\">");
                     }
-                    else {
+                    else
+                    {
                         $("#form_id").val(id);
                     }
-
+                    $("#add_message").addClass("displaynone");
                     $('#myModal').modal('show');
-                    $("#add_menu").addClass("displaynone");
+
                 });
             });
         });
     </script>
+
 @endsection

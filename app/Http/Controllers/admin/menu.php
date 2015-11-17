@@ -11,14 +11,20 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 class menu extends Controller
 {
-    private $url='/admin/menu';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($pid='',$name='')
+    public function __construct()
     {
+        $this->url = '/admin/menu';
+    }
+    public function index(Request $request)
+    {
+        $data = $request->input();
+        $pid = isset($data['pid']) ? $data['pid'] : 0;
+        $name = isset($data['name']) ? $data['name'] : '';
         $pagesize = 20;
         if(!empty($pid))
         {
@@ -29,6 +35,7 @@ class menu extends Controller
         {
             $backid=0;
         }
+        $pid = intval($pid);
         $query = DataMenu::where('parentid',$pid);
         $query->where('status',Config::get("hthou.status_normal"));
         if(!empty($name))
@@ -47,7 +54,7 @@ class menu extends Controller
      */
     public function create()
     {
-        return view('admin.menus');
+
     }
 
     /**
@@ -188,7 +195,7 @@ class menu extends Controller
     public function search(Request $request)
     {
         $data = $request->input();
-        $url = $this->url.'/p/'.$data['pid'].'/name/'.urlencode($data['name']);
+        $url = $this->hht_make_search_url($data,'name');
         $this->hht_redirect($url);
         $this->hht_response_execute();
     }
