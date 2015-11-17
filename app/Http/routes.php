@@ -70,7 +70,7 @@ Route::group(['prefix'=>'admin'],function(){
         Route::resource('/','admin\type');
         Route::get('{id}','admin\type@show')->where('id','[0-9]+');
 
-        
+
 
         Route::post('search','admin\type@search');
         Route::post('delete','admin\type@delete');
