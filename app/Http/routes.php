@@ -27,7 +27,6 @@ Route::group(['prefix'=>'admin'],function(){
         Route::get('ajaxMenuTree','admin\menu@ajaxMenuTree');
         Route::get('ajaxMenuPath/{id}','admin\menu@ajaxMenuPath')->where('id','[0-9]+');
         Route::get('{id}','admin\menu@show')->where('id','[0-9]+');
-
         Route::post('search','admin\menu@search');
         Route::post('delete','admin\menu@delete');
         Route::post('listorder','admin\menu@listorder');
@@ -44,7 +43,6 @@ Route::group(['prefix'=>'admin'],function(){
          * 管理员搜索列表
          */
         Route::get('name/{name?}','admin\manager@index');
-
         Route::post('search','admin\manager@search');
         Route::post('delete','admin\manager@delete');
     });
@@ -55,9 +53,6 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'resource'],function(){
         Route::resource('/','admin\resource');
         Route::get('{id}','admin\resource@show')->where('id','[0-9]+');
-
-
-
         Route::post('listorder','admin\resource@listorder');
         Route::post('delete','admin\resource@delete');
     });
@@ -69,12 +64,43 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'type'],function(){
         Route::resource('/','admin\type');
         Route::get('{id}','admin\type@show')->where('id','[0-9]+');
-
-
-
         Route::post('search','admin\type@search');
         Route::post('delete','admin\type@delete');
         Route::post('listorder','admin\type@listorder');
+    });
+    /**
+     * 权限元管理
+     */
+
+    Route::group(['prefix'=>'privilege'],function(){
+        Route::resource('/','admin\privilege');
+        Route::get('{id}','admin\privilege@show')->where('id','[0-9]+');
+        Route::post('search','admin\privilege@search');
+        Route::post('delete','admin\privilege@delete');
+        Route::post('listorder','admin\privilege@listorder');
+    });
+
+    /**
+     * 组管理
+     */
+
+    Route::group(['prefix'=>'group'],function(){
+        Route::resource('/','admin\group');
+        Route::get('{id}','admin\group@show')->where('id','[0-9]+');
+        Route::post('search','admin\group@search');
+        Route::post('delete','admin\group@delete');
+        Route::post('listorder','admin\group@listorder');
+    });
+    /**
+     * 角色管理
+     */
+
+    Route::group(['prefix'=>'role'],function(){
+        Route::resource('/','admin\role');
+        Route::get('{id}','admin\role@show')->where('id','[0-9]+');
+        Route::post('search','admin\role@search');
+        Route::post('delete','admin\role@delete');
+        Route::post('listorder','admin\role@listorder');
     });
 
 });
