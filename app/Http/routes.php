@@ -53,6 +53,7 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'resource'],function(){
         Route::resource('/','admin\resource');
         Route::get('{id}','admin\resource@show')->where('id','[0-9]+');
+        Route::get('restree','admin\resource@ajaxGetResTree');
         Route::post('listorder','admin\resource@listorder');
         Route::post('delete','admin\resource@delete');
     });

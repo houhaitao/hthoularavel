@@ -71,6 +71,10 @@
                                 <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
                                 <td>{{$r->group_name}}</td>
                                 <td class="center">
+                                    <a class="btn btn-info priv_mod" id="priv_{{$r->id}}" href="javascript:void(0);">
+                                        <i class="glyphicon glyphicon-edit icon-white"></i>
+                                        组权限
+                                    </a>
                                     <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                         修改
@@ -131,6 +135,70 @@
                 </div>
             </div>
         </div>
+<!--组权限-->
+        <div class="modal fade" id="myPrivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{$url}}" name="add_form" method="post"
+                          onsubmit="return r_submit(this)">
+                        <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h3>修改组权限</h3>
+                        </div>
+                        <div class="modal-body" id="priv_area">
+                            <div class="box-content">
+                                <ul class="nav nav-tabs" id="myTab">
+                                    <li class="active"><a href="#info">Info</a></li>
+                                    <li><a href="#custom">Custom</a></li>
+                                    <li><a href="#messages">Messages</a></li>
+                                </ul>
+
+                                <div id="myTabContent" class="tab-content">
+                                    <div class="tab-pane active" id="info">
+                                        <h3>Charisma
+                                            <small>a full featured template</small>
+                                        </h3>
+                                        <p>It's a full featured, responsive template for your admin panel. It's optimized for tablets
+                                            and mobile phones.</p>
+
+                                        <p>Check how it looks on different devices:</p>
+                                        <a href="http://www.responsinator.com/?url=usman.it%2Fthemes%2Fcharisma"
+                                           target="_blank"><strong>Preview on iPhone size.</strong></a>
+                                        <br>
+                                        <a href="http://www.responsinator.com/?url=usman.it%2Fthemes%2Fcharisma"
+                                           target="_blank"><strong>Preview on iPad size.</strong></a>
+                                    </div>
+                                    <div class="tab-pane" id="custom">
+                                        <h3>Custom
+                                            <small>small text</small>
+                                        </h3>
+                                        <p>Sample paragraph.</p>
+
+                                        <p>Your custom text.</p>
+                                    </div>
+                                    <div class="tab-pane" id="messages">
+                                        <h3>Messages
+                                            <small>small text</small>
+                                        </h3>
+                                        <p>Sample paragraph.</p>
+
+                                        <p>Your custom text.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                            <input type="submit" value="提交" class="btn btn-primary">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+<!--组权限结束-->
         <div class="modal fade" id="mydialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true">
 
@@ -193,6 +261,18 @@
                     $('#myModal').modal('show');
 
                 });
+            });
+
+            /**
+             * 组权限
+             */
+            $(".priv_mod").click(function(e){
+                e.preventDefault();
+
+
+
+                $('#myPrivModal').modal('show');
+
             });
         });
     </script>

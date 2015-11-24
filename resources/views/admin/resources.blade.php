@@ -26,7 +26,6 @@
                                 <th>排序</th>
                                 <th>名称</th>
                                 <th>编号</th>
-                                <th>sql</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
@@ -37,7 +36,6 @@
                                     <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
                                     <td>{{$r->name}}</td>
                                     <td class="center">{{$r->view_type}}</td>
-                                    <td class="center">{{$r->res_sql}}</td>
                                     <td class="center">
                                         <a class="btn btn-info resource_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
                                             <i class="glyphicon glyphicon-edit icon-white"></i>
@@ -90,9 +88,14 @@
                                        placeholder="编号">
                             </div>
                             <div class="form-group col-md-12">
-                                <textarea name="res_sql" id="form_res_sql" class="form-control" placeholder="sql"
-                                          cols="30" rows="10"></textarea>
+                                <input type="text" class="form-control" id="form_res_sql" name="res_sql"
+                                       placeholder="sql">
                             </div>
+                            <div class="form-group col-md-12">
+                                <input type="text" class="form-control" id="form_params" name="params"
+                                       placeholder="数据">
+                            </div>
+
 
                             <div class="clear"></div>
                         </div>
@@ -137,6 +140,8 @@
                 $("#form_name").val("");
                 $("#form_view_type").val("");
                 $("#form_res_sql").val("");
+                $("#form_params").val("");
+
                 if($("#form_id").val() != undefined)
                 {
                     $("#form_id").remove();
@@ -156,10 +161,11 @@
                     $("#form_name").val(myobj.name);
                     $("#form_view_type").val(myobj.view_type);
                     $("#form_res_sql").val(myobj.res_sql);
+                    $("#form_params").val(myobj.params);
 
                     if($("#form_id").val() == undefined)
                     {
-                        $("#form_res_sql").after("<input type=\"hidden\" name=\"id\" id=\"form_id\" value=\""+myobj.id+"\">");
+                        $("#form_params").after("<input type=\"hidden\" name=\"id\" id=\"form_id\" value=\""+myobj.id+"\">");
                     }
                     else
                     {
