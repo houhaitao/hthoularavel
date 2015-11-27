@@ -69,7 +69,7 @@ class role extends Controller
             }
             $role_data = new DataRole();
             $role_data->name = $data['name'];
-            $role_data->privilege = '';
+            $role_data->privilege = '[]';
             $role_data->description = $data['description'];
             $role_data->addtime = time();
             $role_data->listorder = 0;
@@ -172,4 +172,31 @@ class role extends Controller
         $this->hht_alert_ok('info','删除成功');
         $this->hht_response_execute();
     }
+    public function privStore(Request $request)
+    {
+        $data = $request->input();
+        $role_id = $data['id'];
+        $priv = $data['priv'];
+        $info = DataRole::find($role_id);
+        $info->privilege = json_encode($priv);
+        $info->save();
+        $this->hht_alert_ok('info','权限设置成功');
+        $this->hht_response_execute();
+    }
+    public function getAllRoles()
+    {
+        $query = DataRole::where('status',Config::get('hthou.status_normal'));
+        $res = $query->orderBy('listorder','desc')->orderBy('id','desc')->get();
+        $list = array();
+        foreach($res as $r)
+        {
+            $tmp = array(
+                'name'      =>  $r->name,
+                'id'        =>  $r->id,
+            );
+            $list[] = $tmp;
+        }
+        return json_encode($list);
+    }
+
 }

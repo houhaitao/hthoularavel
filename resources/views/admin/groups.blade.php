@@ -141,52 +141,23 @@
 
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{$url}}" name="add_form" method="post"
+                    <form action="{{$url}}/priv" name="add_form" method="post"
                           onsubmit="return r_submit(this)">
                         <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
+                        <input type="hidden" name="id" id="priv_id" value="">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">×</button>
                             <h3>修改组权限</h3>
                         </div>
                         <div class="modal-body" id="priv_area">
                             <div class="box-content">
-                                <ul class="nav nav-tabs" id="myTab">
-                                    <li class="active"><a href="#info">Info</a></li>
-                                    <li><a href="#custom">Custom</a></li>
-                                    <li><a href="#messages">Messages</a></li>
+                                <ul class="nav nav-tabs priv_tab" id="myTab">
+
                                 </ul>
 
-                                <div id="myTabContent" class="tab-content">
-                                    <div class="tab-pane active" id="info">
-                                        <h3>Charisma
-                                            <small>a full featured template</small>
-                                        </h3>
-                                        <p>It's a full featured, responsive template for your admin panel. It's optimized for tablets
-                                            and mobile phones.</p>
-
-                                        <p>Check how it looks on different devices:</p>
-                                        <a href="http://www.responsinator.com/?url=usman.it%2Fthemes%2Fcharisma"
-                                           target="_blank"><strong>Preview on iPhone size.</strong></a>
-                                        <br>
-                                        <a href="http://www.responsinator.com/?url=usman.it%2Fthemes%2Fcharisma"
-                                           target="_blank"><strong>Preview on iPad size.</strong></a>
-                                    </div>
-                                    <div class="tab-pane" id="custom">
-                                        <h3>Custom
-                                            <small>small text</small>
-                                        </h3>
-                                        <p>Sample paragraph.</p>
-
-                                        <p>Your custom text.</p>
-                                    </div>
-                                    <div class="tab-pane" id="messages">
-                                        <h3>Messages
-                                            <small>small text</small>
-                                        </h3>
-                                        <p>Sample paragraph.</p>
-
-                                        <p>Your custom text.</p>
-                                    </div>
+                                <div id="myTabContent" class="tab-content priv_content">
+                                    <img src="/img/ajax-loaders/ajax-loader-6.gif"
+                                         title="/img/ajax-loaders/ajax-loader-6.gif">
                                 </div>
                             </div>
                         </div>
@@ -223,6 +194,68 @@
     </div><!--/#content.col-md-0-->
     <script>
         var type_url = '/admin/group/';
+        var group_priv;
+
+        function make_tree(data,mytype)
+        {
+            var len = data.length;
+            var i=0;
+            var html = '<div class="hht-tree">';
+            var myinfo;
+            var mylevelmore = false; //本层级下是否有节点有子节点
+            for(i=0;i<len;i++)
+            {
+                myinfo = data[i];
+                if(myinfo.child.length > 0)
+                {
+                    mylevelmore = true;
+                }
+
+            }
+            //如果均没有子节点
+            if(mylevelmore === false)
+            {
+                for(i=0;i<len;i++)
+                {
+                    myinfo = data[i];
+                    html += '<input type="checkbox" class="priv_ck" id="'+mytype+'_'+myinfo.info.id+'" name="priv[]" value="'+mytype+'_'+myinfo.info.id+'">'+myinfo.info.title+'&nbsp;';
+
+                }
+            }
+            else
+            {
+                for(i=0;i<len;i++)
+                {
+                    myinfo = data[i];
+                    html += '<div><input type="checkbox" class="priv_ck" id="'+mytype+'_'+myinfo.info.id+'" name="priv[]" value="'+mytype+'_'+myinfo.info.id+'"><b>'+myinfo.info.title+'</b>';
+                    if(myinfo.child.length >0 )
+                    {
+                        html += make_tree(myinfo.child, mytype);
+                    }
+                    html += '</div>';
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function make_priv_tree(data)
+        {
+            var str='';
+            var len = data.length;
+            var i;
+            var act;
+            var myinfo;
+            for(i=0;i<len;i++)
+            {
+                myinfo = data[i];
+                act = i==0 ? 'active' : '';
+                str += '<div class="tab-pane '+act+'" id="'+myinfo.info.view_type+'">';
+                str += make_tree(myinfo.data,myinfo.info.view_type);
+                str += '</div>';
+            }
+            return str;
+        }
         $(document).ready(function () {
             /**
              * 分类管理
@@ -268,6 +301,53 @@
              */
             $(".priv_mod").click(function(e){
                 e.preventDefault();
+                var id_str = $(this).attr('id');
+                var id = id_str.replace('priv_','');
+                $('#priv_id').val(id);
+                $.get(type_url+'groupres/'+id,function(result_res){
+                    group_priv = JSON.parse(result_res);
+                    $.get('/admin/resource/restree',function(result){
+                        var myobj = JSON.parse(result);
+                        var myobj_len = myobj.length;
+                        var i,j;
+                        var act_class;
+                        var tab_str = '';
+                        var inner_str = '';
+                        for(i=0;i<myobj_len;i++)
+                        {
+                            if(i==0)
+                            {
+                                act_class= 'class="active"';
+                            }
+                            else
+                            {
+                                act_class='';
+                            }
+                            tab_str += '<li '+act_class+'><a href="#'+myobj[i].info.view_type+'">'+myobj[i].info.name+'</a></li>';
+                            $(".priv_tab").html(tab_str);
+                            inner_str = make_priv_tree(myobj);
+                            $(".priv_content").html(inner_str);
+
+                        }
+                        $('.nav-tabs a').click(function (e) {
+                            e.preventDefault()
+                            $(this).tab('show')
+                        })
+                        $('.priv_ck').click(function(e){
+                            if($(this).is(':checked')==true)
+                            {
+                                $(this).parent().parents().children('.priv_ck').prop("checked",true);
+                            }
+                        });
+                        for(i=0;i<group_priv.length;i++)
+                        {
+                            $('#'+group_priv[i][0]+'_'+group_priv[i][1]).prop("checked",true);
+                            $('#'+group_priv[i][0]+'_'+group_priv[i][1]).parent().parents().children('.priv_ck').prop("checked",true);
+                        }
+
+                    });
+
+                });
 
 
 

@@ -76,6 +76,7 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'privilege'],function(){
         Route::resource('/','admin\privilege');
         Route::get('{id}','admin\privilege@show')->where('id','[0-9]+');
+        Route::get('typedata','admin\privilege@getTypeData');
         Route::post('search','admin\privilege@search');
         Route::post('delete','admin\privilege@delete');
         Route::post('listorder','admin\privilege@listorder');
@@ -88,9 +89,12 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'group'],function(){
         Route::resource('/','admin\group');
         Route::get('{id}','admin\group@show')->where('id','[0-9]+');
+        Route::get('groupres/{id}','admin\group@ajaxGetGroupResource')->where('id','[0-9]+');
+        Route::get('allgroup','admin\group@getAllGroups');
         Route::post('search','admin\group@search');
         Route::post('delete','admin\group@delete');
         Route::post('listorder','admin\group@listorder');
+        Route::post('priv','admin\group@storePriv');
     });
     /**
      * 角色管理
@@ -99,9 +103,11 @@ Route::group(['prefix'=>'admin'],function(){
     Route::group(['prefix'=>'role'],function(){
         Route::resource('/','admin\role');
         Route::get('{id}','admin\role@show')->where('id','[0-9]+');
+        Route::get('allrole','admin\role@getAllRoles');
         Route::post('search','admin\role@search');
         Route::post('delete','admin\role@delete');
         Route::post('listorder','admin\role@listorder');
+        Route::post('storepriv','admin\role@privStore');
     });
 
 });

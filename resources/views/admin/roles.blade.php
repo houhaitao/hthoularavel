@@ -71,6 +71,10 @@
                                 <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
                                 <td>{{$r->name}}</td>
                                 <td class="center">
+                                    <a class="btn btn-info priv_mod" id="priv_{{$r->id}}" href="javascript:void(0);">
+                                        <i class="glyphicon glyphicon-edit icon-white"></i>
+                                        权限
+                                    </a>
                                     <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                         修改
@@ -131,6 +135,39 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="privModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{$url}}/storepriv" name="add_form" method="post"
+                          onsubmit="return r_submit(this)">
+                        <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
+                        <input type="hidden" name="id" id="role_priv_id" value="">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h3>角色权限设置</h3>
+                        </div>
+                        <div class="modal-body">
+                            <div id="add_message_priv" class="alert alert-info displaynone"></div>
+
+                            <div class="form-group col-md-12 priv_content">
+
+                                <img src="/img/ajax-loaders/ajax-loader-6.gif"
+                                     title="/img/ajax-loaders/ajax-loader-6.gif">
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                            <input type="submit" value="提交" class="btn btn-primary">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="mydialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true">
 
@@ -155,6 +192,7 @@
     </div><!--/#content.col-md-0-->
     <script>
         var type_url = '/admin/role/';
+        var role_priv;
         $(document).ready(function () {
             /**
              * 分类管理
@@ -168,7 +206,7 @@
                     $("#form_id").remove();
                 }
 
-                $("#add_resource").addClass("displaynone");
+                $("#add_message").addClass("displaynone");
                 $('#myModal').modal('show');
 
             });
@@ -194,6 +232,46 @@
 
                 });
             });
+
+            /**
+             * 角色权限管理
+             */
+            $(".priv_mod").click(function(e){
+                e.preventDefault();
+                var id_str = $(this).attr('id');
+                var id = id_str.replace('priv_','');
+                $('#role_priv_id').val(id);
+                $.get(type_url+id,function(result_type){
+                    var role_data = JSON.parse(result_type);
+                    role_priv = JSON.parse(role_data.privilege);
+                    $.get('/admin/privilege/typedata',function(result){
+                        var html = '';
+                        var mydata = JSON.parse(result);
+                        for(var k in mydata)
+                        {
+                            if(mydata[k].data.length >0)
+                            {
+                                html += '<div><div><b>'+mydata[k].type_info+'</b></div><div class="hht-tree"><ul>';
+                                for(var j=0;j<mydata[k].data.length;j++)
+                                {
+                                    html += '<li><input type="checkbox" id="priv_'+mydata[k].data[j].code+'" name="priv[]" value="'+mydata[k].data[j].code+'">'+mydata[k].data[j].name+'</li>';
+                                }
+                                html+='</ul><div class="clear"></div></div></div>';
+                            }
+
+                        }
+                        $('.priv_content').html(html);
+                        for(var j=0;j<role_priv.length;j++)
+                        {
+                            $("#priv_"+role_priv[j]).prop("checked",true);
+                        }
+                    });
+                });
+                $("#add_message_priv").addClass("displaynone");
+                $('#privModal').modal('show');
+
+            });
+
         });
     </script>
 

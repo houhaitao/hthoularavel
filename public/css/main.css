@@ -16,3 +16,22 @@
     text-align: right;
     padding-right: 20px;
 }
+.hht-tree{
+    padding-left: 20px;
+}
+.priv_content{
+    overflow-y:auto;
+    max-height: 500px;
+}
+.priv_content ul{
+    display: block;
+    padding: 0px;
+}
+.priv_content li{
+    list-style: none;
+    display: block;
+    max-width: 200px;
+    float: left;
+    padding-left: 10px;
+    height: 30px;
+}

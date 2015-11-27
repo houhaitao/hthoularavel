@@ -172,19 +172,37 @@ class resource extends Controller
     {
         $res = DataResource::orderBy('listorder','desc')->get();
         $list = array();
+        $i=0;
         foreach($res as $v)
         {
-            $list[$v['view_type']] = array();
-            $list[$v['view_type']]['info'] = $v;
+            $list[$i] = array();
+            $list[$i]['info'] = $v;
             $params = explode(',',$v['params']);
             $ff = DB::select($v['res_sql'],$params);
+            $tree = array();
+            $this->make_tree($ff,$tree,0);
+            $list[$i]['data'] = $tree;
+            $i++;
+        }
+        return json_encode($list);
 
-            $list = array();
-            foreach($ff as $f)
+    }
+
+    private function make_tree($data,&$tree,$parentid)
+    {
+        foreach($data as $v)
+        {
+            if($v->parentid == $parentid)
             {
-                $list[] =$f->id;
+                $info = array(
+                    'id'        =>  $v->id,
+                    'parentid'  =>  $v->parentid,
+                    'title'     =>  $v->title
+                );
+                $child = array();
+                $this->make_tree($data,$child,$v->id);
+                $tree[] = array('info'=>$info,'child'=>$child);
             }
-            print_r($list);
         }
     }
 }

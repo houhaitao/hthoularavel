@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\model\DataGroup;
+use App\model\DataGroupResource;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -171,5 +172,56 @@ class group extends Controller
         }
         $this->hht_alert_ok('info','删除成功');
         $this->hht_response_execute();
+    }
+
+    public function ajaxGetGroupResource($group_id)
+    {
+        $res = DataGroupResource::where('group_id',$group_id)->get();
+        $list = array();
+        foreach($res as $v)
+        {
+            $list[]=array($v->resource_type,$v->resource_id);
+        }
+        return json_encode($list);
+    }
+
+    public function storePriv(Request $request)
+    {
+        $data = $request->input();
+        $groupid = $data['id'];
+        $resource = $data['priv'];
+        DataGroupResource::where('group_id',$groupid)->delete();
+        if(is_array($resource))
+        {
+            foreach($resource as $v)
+            {
+                $tmp = explode('_',$v);
+                $view_type = $tmp[0];
+                $view_id = $tmp[1];
+                $gr_data = new DataGroupResource();
+                $gr_data->resource_type = $view_type;
+                $gr_data->resource_id = $view_id;
+                $gr_data->group_id = $groupid;
+                $gr_data->save();
+            }
+        }
+        $this->hht_alert_ok('info','组权限信息保存成功');
+        $this->hht_response_execute();
+    }
+
+    public function getAllGroups()
+    {
+        $query = DataGroup::where('status',Config::get('hthou.status_normal'));
+        $res = $query->orderBy('listorder','desc')->orderBy('id','desc')->get();
+        $list = array();
+        foreach($res as $r)
+        {
+            $tmp = array(
+                'name'      =>  $r->group_name,
+                'id'        =>  $r->id,
+            );
+            $list[] = $tmp;
+        }
+        return json_encode($list);
     }
 }
