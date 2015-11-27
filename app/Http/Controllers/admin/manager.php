@@ -87,6 +87,8 @@ class manager extends Controller
             $manager_data->usertype = $data['usertype'];
             $manager_data->status = Config::get("hthou.status_normal");
             $manager_data->addtime = time();
+            $manager_data->groups = '[]';
+            $manager_data->roles = '[]';
             $manager_data->save();
         }
         else //修改

@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\model\DataResource;
 use Illuminate\Support\Facades\Config;
+use DB;
 class resource extends Controller
 {
     public function __construct()
@@ -47,55 +48,42 @@ class resource extends Controller
     {
         //
         $data = $request->input();
+        if(empty($data['name']))
+        {
+            $this->hht_alert('add_resource','danger','请填写资源名称');
+            $this->hht_response_execute();
+        }
+        if(empty($data['view_type']))
+        {
+            $this->hht_alert('add_resource','danger','请填写编码');
+            $this->hht_response_execute();
+        }
+        if(empty($data['res_sql']))
+        {
+            $this->hht_alert('add_resource','danger','请填写sql');
+            $this->hht_response_execute();
+        }
+
 
         if(!isset($data['id'])) //添加
         {
-            if(empty($data['name']))
-            {
-                $this->hht_alert('add_resource','danger','请填写资源名称');
-                $this->hht_response_execute();
-            }
-            if(empty($data['view_type']))
-            {
-                $this->hht_alert('add_resource','danger','请填写编码');
-                $this->hht_response_execute();
-            }
-            if(empty($data['res_sql']))
-            {
-                $this->hht_alert('add_resource','danger','请填写sql');
-                $this->hht_response_execute();
-            }
-
             $resource_data = new DataResource();
 
             $resource_data->name = $data['name'];
             $resource_data->view_type = $data['view_type'];
             $resource_data->res_sql = $data['res_sql'];
+            $resource_data->params = $data['params'];
             $resource_data->listorder = 0;
             $resource_data->save();
         }
         else //修改
         {
-            if(empty($data['name']))
-            {
-                $this->hht_alert('add_resource','danger','请填写资源名称');
-                $this->hht_response_execute();
-            }
-            if(empty($data['view_type']))
-            {
-                $this->hht_alert('add_resource','danger','请填写编码');
-                $this->hht_response_execute();
-            }
-            if(empty($data['res_sql']))
-            {
-                $this->hht_alert('add_resource','danger','请填写sql');
-                $this->hht_response_execute();
-            }
+
             $resource_data = DataResource::find($data['id']);
             $resource_data->name = $data['name'];
             $resource_data->view_type = $data['view_type'];
             $resource_data->res_sql = $data['res_sql'];
-
+            $resource_data->params = $data['params'];
             $resource_data->save();
         }
         $this->hht_alert_ok('info','数据资源保存成功');
@@ -178,5 +166,43 @@ class resource extends Controller
         }
         $this->hht_alert_ok('info','排序成功');
         $this->hht_response_execute();
+    }
+
+    public function ajaxGetResTree()
+    {
+        $res = DataResource::orderBy('listorder','desc')->get();
+        $list = array();
+        $i=0;
+        foreach($res as $v)
+        {
+            $list[$i] = array();
+            $list[$i]['info'] = $v;
+            $params = explode(',',$v['params']);
+            $ff = DB::select($v['res_sql'],$params);
+            $tree = array();
+            $this->make_tree($ff,$tree,0);
+            $list[$i]['data'] = $tree;
+            $i++;
+        }
+        return json_encode($list);
+
+    }
+
+    private function make_tree($data,&$tree,$parentid)
+    {
+        foreach($data as $v)
+        {
+            if($v->parentid == $parentid)
+            {
+                $info = array(
+                    'id'        =>  $v->id,
+                    'parentid'  =>  $v->parentid,
+                    'title'     =>  $v->title
+                );
+                $child = array();
+                $this->make_tree($data,$child,$v->id);
+                $tree[] = array('info'=>$info,'child'=>$child);
+            }
+        }
     }
 }

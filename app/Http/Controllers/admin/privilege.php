@@ -194,4 +194,28 @@ class privilege extends Controller
         $this->hht_alert_ok('info','删除成功');
         $this->hht_response_execute();
     }
+
+    public function getTypeData()
+    {
+        $type_res = DataType::where('parent_code',$this->priv_type_code)->where("status",Config::get("hthou.status_normal"))->orderBy('listorder','desc')->orderBy('id','desc')->get();
+        foreach($type_res as $type_info)
+        {
+            $typelist[$type_info->type_code] = $type_info->type_name;
+        }
+        $query = DataPrivilege::where('status',Config::get('hthou.status_normal'));
+        $res = $query->orderBy('listorder','desc')->orderBy('id','desc')->get();
+        $list = array();
+        foreach($res as $v)
+        {
+            if(!isset($list[$v->type_code]))
+            {
+                $list[$v->type_code] = array('type_info'=>$typelist[$v->type_code],'data'=>array());
+            }
+            $list[$v->type_code]['data'][] = array(
+                'code'  =>  $v->code,
+                'name'  =>  $v->name
+            );
+        }
+        return json_encode($list);
+    }
 }
