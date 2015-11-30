@@ -1,49 +1,14 @@
 @extends('admin.main')
-@section('title','组管理')
+@section('title','组成员管理')
 @section('content')
-    <div class="row">
 
-        <div class="box col-md-12">
-            <div class="box-inner">
-                <div class="box-header well" data-original-title="">
-                    <h2><i class="glyphicon glyphicon-edit"></i> 搜索</h2>
-
-                    <div class="box-icon">
-
-                        <a href="#" class="btn btn-minimize btn-round btn-default"><i class="glyphicon glyphicon-chevron-up"></i></a>
-                    </div>
-                    <div class="clear"></div>
-                </div>
-                <div class="box-content">
-                    <form role="form" method="post" action="{{$url}}/search" onsubmit="return r_submit(this)">
-                        <div class="col-md-12">
-                            <div class="form-group col-md-4">
-                                <input type="text" name="name" value="{{$name}}" class="form-control" id="exampleInputEmail1" placeholder="组名称" />
-
-                                <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
-                            </div>
-                            <div class="form-group col-md-4">
-                                <label for="exampleInputPassword1">&nbsp;</label>
-                                <button type="submit" class="btn btn-default">Submit</button>
-                            </div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="clear"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!--/span-->
-
-    </div><!--/row-->
 
     <div class="row">
 
         <div class="box col-md-12">
             <div class="box-inner">
                 <div class="box-header well" data-original-title="">
-                    <h2><i class="glyphicon glyphicon-user"></i> 组管理</h2>
+                    <h2><i class="glyphicon glyphicon-user"></i> 组成员管理</h2>
 
                     <div class="box-icon">
 
@@ -59,8 +24,8 @@
                             <thead>
                             <tr>
                                 <th><input type="checkbox" id="checkall" children="ck"/></th>
-                                <th>排序</th>
-                                <th>组名称</th>
+                                <th>用户名</th>
+                                <th>昵称</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
@@ -68,20 +33,12 @@
                             @foreach($data as $r)
                             <tr>
                                 <td><input type="checkbox" name="id[]" class="ck" value="{{$r->id}}"/></td>
-                                <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
-                                <td>{{$r->group_name}}</td>
+                                <td>{{$r->manager->username}}</td>
+                                <td>@if(empty($r->manager->nickname))未设置@else{{$r->manager->nickname}}@endif</td>
                                 <td class="center">
                                     <a class="btn btn-info priv_mod" id="priv_{{$r->id}}" href="javascript:void(0);">
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        组权限
-                                    </a>
-                                    <a class="btn btn-info mem_mod" id="mem_{{$r->id}}" href="/admin/group/members/{{$r->id}}">
-                                        <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        组成员
-                                    </a>
-                                    <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
-                                        <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        修改
+                                        组成员角色
                                     </a>
                                 </td>
                             </tr>
@@ -94,7 +51,6 @@
                             <div class="col-md-4">
                                 <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                                 <input type="button" onclick="change_opt('form1','{{$url}}/delete')" class="btn btn-danger" value="删除"/>&nbsp;
-                                <input type="button" onclick="change_opt('form1','{{$url}}/listorder')" class="btn btn-default" value="排序"/>&nbsp;
                                 <input type="button" id="op_add_form" class="btn btn-success" value="添加"/>
                             </div>
                             <div class="col-md-8 no-padding no-margin myright">

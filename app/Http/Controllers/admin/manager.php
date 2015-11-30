@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\model\DataGroup;
+use App\model\DataGroupManager;
+use App\model\DataRole;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -33,7 +36,11 @@ class manager extends Controller
         }
         $query->orderBy('id','asc');
         $list = $query->paginate($pagesize);
-        return view('admin.managers',['data'=>$list,'url'=>$this->url,'name'=>$name]);
+        $query = DataRole::where('status',Config::get('hthou.status_normal'));
+        $role_res = $query->orderBy('listorder','desc')->orderBy('id','desc')->get();
+        $query = DataGroup::where('status',Config::get('hthou.status_normal'));
+        $group_res = $query->orderBy('listorder','desc')->orderBy('id','desc')->get();
+        return view('admin.managers',['data'=>$list,'url'=>$this->url,'name'=>$name,'roles'=>$role_res,'groups'=>$group_res]);
     }
 
     /**
@@ -81,15 +88,29 @@ class manager extends Controller
                 $this->hht_alert('add_manager','danger','该用户名已存在，请更换用户名');
                 $this->hht_response_execute();
             }
+            $groups = isset($data['groups']) && is_array($data['groups']) ? $data['groups'] : array();
+            $roles = isset($data['roles']) && is_array($data['roles']) ? $data['roles'] : array();
             $manager_data->username = $data['username'];
             $manager_data->password = $manager_data->password_encode($data['password']);
             $manager_data->nickname = $data['nickname'];
             $manager_data->usertype = $data['usertype'];
             $manager_data->status = Config::get("hthou.status_normal");
             $manager_data->addtime = time();
-            $manager_data->groups = '[]';
-            $manager_data->roles = '[]';
+            $manager_data->groups = json_encode($groups);
+            $manager_data->roles = json_encode($roles);
             $manager_data->save();
+            if(sizeof($groups) >0)
+            {
+                foreach($groups as $gid)
+                {
+                    $group_ma = new DataGroupManager();
+                    $group_ma->group_id = $gid;
+                    $group_ma->manager_id = $manager_data->id;
+                    $group_ma->save();
+                }
+            }
+
+
         }
         else //修改
         {
@@ -99,12 +120,29 @@ class manager extends Controller
                 $this->hht_response_execute();
             }
             $manager_data = DataManager::find($data['id']);
+            $groups = isset($data['groups']) && is_array($data['groups']) ? $data['groups'] : array();
+            $roles = isset($data['roles']) && is_array($data['roles']) ? $data['roles'] : array();
             if(!empty($data['password']))
             {
                 $manager_data->password = $manager_data->password_encode($data['password']);
             }
             $manager_data->nickname = $data['nickname'];
-
+            if($manager_data->usertype == '0')
+            {
+                $manager_data->groups = json_encode($groups);
+                $manager_data->roles = json_encode($roles);
+                DataGroupManager::where('manager_id',$data['id'])->delete();
+                if(sizeof($groups) >0)
+                {
+                    foreach($groups as $gid)
+                    {
+                        $group_ma = new DataGroupManager();
+                        $group_ma->group_id = $gid;
+                        $group_ma->manager_id = $manager_data->id;
+                        $group_ma->save();
+                    }
+                }
+            }
             $manager_data->save();
         }
         $this->hht_alert_ok('info','管理员信息保存成功');

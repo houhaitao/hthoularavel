@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\model\DataGroup;
+use App\model\DataGroupManager;
 use App\model\DataGroupResource;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -223,5 +224,11 @@ class group extends Controller
             $list[] = $tmp;
         }
         return json_encode($list);
+    }
+
+    public function getGroupMembers($id)
+    {
+        $res = DataGroupManager::where('group_id',$id)->orderBy('id','desc')->paginate(50);
+        return view('admin.group_members',['data'=>$res,'url'=>$this->url]);
     }
 }
