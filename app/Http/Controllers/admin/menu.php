@@ -35,6 +35,7 @@ class menu extends Controller
         {
             $backid=0;
         }
+        $ab->test();
         $pid = intval($pid);
         $query = DataMenu::where('parentid',$pid);
         $query->where('status',Config::get("hthou.status_normal"));

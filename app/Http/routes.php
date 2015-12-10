@@ -91,10 +91,13 @@ Route::group(['prefix'=>'admin'],function(){
         Route::get('{id}','admin\group@show')->where('id','[0-9]+');
         Route::get('groupres/{id}','admin\group@ajaxGetGroupResource')->where('id','[0-9]+');
         Route::get('allgroup','admin\group@getAllGroups');
+        Route::get('member/{id}','admin\group@getMembers')->where('id','[0-9]+');
         Route::post('search','admin\group@search');
         Route::post('delete','admin\group@delete');
         Route::post('listorder','admin\group@listorder');
         Route::post('priv','admin\group@storePriv');
+        Route::post('role','admin\group@storeRole');
+        Route::get('roles/{id}','admin\group@getGroupRoleAndPrivilege')->where('id','[0-9]+');
     });
     /**
      * 角色管理

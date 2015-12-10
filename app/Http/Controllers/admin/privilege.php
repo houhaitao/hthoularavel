@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Config;
 
 class privilege extends Controller
 {
-    private $priv_type_code = 'priv';
+    public $priv_type_code = 'priv';
     public function __construct()
     {
         $this->url = '/admin/privilege';
@@ -195,7 +195,7 @@ class privilege extends Controller
         $this->hht_response_execute();
     }
 
-    public function getTypeData()
+    public function getTypeData($format = true)
     {
         $type_res = DataType::where('parent_code',$this->priv_type_code)->where("status",Config::get("hthou.status_normal"))->orderBy('listorder','desc')->orderBy('id','desc')->get();
         foreach($type_res as $type_info)
@@ -216,6 +216,6 @@ class privilege extends Controller
                 'name'  =>  $v->name
             );
         }
-        return json_encode($list);
+        return $format === true ? json_encode($list) : $list;
     }
 }

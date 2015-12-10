@@ -141,6 +141,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <label class="col-md-12 super_none">角色</label>
+                            <div class="form-group col-md-12 super_none">
+
+                                @foreach($role_list as $r)
+                                    <input type="checkbox" class="roles" name="roles[]" value="{{$r->id}}">{{$r->name}}&nbsp;
+                                @endforeach
+                            </div>
+                            <label class="col-md-12 super_none">组</label>
+                            <div class="form-group col-md-12 super_none">
+
+                                @foreach($group_list as $g)
+                                    <input type="checkbox" class="groups" name="groups[]" value="{{$g->id}}">{{$g->group_name}}&nbsp;
+                                @endforeach
+                            </div>
                             <div class="clear"></div>
                         </div>
                         <div class="modal-footer">
@@ -195,14 +209,39 @@
                 select_html += "<option value=\"99\">超级管理员</option></select></div>";
                 $(".myusertype").html(select_html);
                 $("#add_manager").addClass("displaynone");
+                $("#form_usertype").change(function(e){
+                    if($(this).val()=='99')
+                    {
+                        $(".super_none").hide();
+                    }
+                    else
+                    {
+                        $(".super_none").show();
+                    }
+                });
+                $(".roles").prop("checked",false);
+                $(".groups").prop("checked",false);
                 $('#myModal').modal('show');
 
+            });
+
+            $("#form_usertype").change(function(e){
+                if($(this).val()=='99')
+                {
+                    $(".super_none").hide();
+                }
+                else
+                {
+                    $(".super_none").show();
+                }
             });
 
             $(".manager_mod").click(function(e){
                 var id_str = $(this).attr('id');
                 var id = id_str.replace('mod_','');
                 var url = manager_url+id;
+                $(".roles").prop("checked",false);
+                $(".groups").prop("checked",false);
                 $.get(url, function(result){
                     var myobj = JSON.parse(result);
                     $(".myusername").html(myobj.username);
@@ -217,6 +256,25 @@
                     else
                     {
                         $("#form_id").val(id);
+                    }
+                    if(myobj.usertype=='99')
+                    {
+                        $(".super_none").hide();
+                    }
+                    else
+                    {
+                        $(".super_none").show();
+                        var roles = JSON.parse(myobj.roles);
+                        var groups = JSON.parse(myobj.groups);
+                        var i;
+                        for(i=0;i<roles.length;i++)
+                        {
+                            $(".roles[value='"+roles[i]+"']").prop("checked",true);
+                        }
+                        for(i=0;i<groups.length;i++)
+                        {
+                            $(".groups[value='"+groups[i]+"']").prop("checked",true);
+                        }
                     }
                     $("#add_manager").addClass("displaynone");
                     $('#myModal').modal('show');

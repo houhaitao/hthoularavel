@@ -4,10 +4,16 @@ namespace App\Http\Controllers\admin;
 
 use App\model\DataGroup;
 use App\model\DataGroupResource;
+use App\model\DataGroupRole;
+use App\model\DataRole;
+use App\model\DataType;
+use App\model\DataPrivilege;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Config;
+use App\Http\Controllers\admin\privilege;
+use Tools\GlobalTools;
 
 class group extends Controller
 {
@@ -33,7 +39,17 @@ class group extends Controller
         }
         $query->orderBy('listorder','desc')->orderBy('id','desc');
         $list = $query->paginate($pagesize);
-        return view('admin.groups',['data'=>$list,'name'=>$name,'url'=>$this->url]);
+        $roles = DataRole::where('status',Config::get('hthou.status_normal'))->get();
+        $priv_ob = new privilege();
+        $mk_forward = GlobalTools::make_forward();
+        $priv_list = $priv_ob->getTypeData(false);
+        return view('admin.groups',['mk_forward'=>$mk_forward,'data'=>$list,'name'=>$name,'url'=>$this->url,'roles'=>$roles,'priv_list'=>$priv_list]);
+    }
+
+    public function getMembers($id,Request $request)
+    {
+        $forward = GlobalTools::get_forward();
+
     }
 
     /**
@@ -209,6 +225,26 @@ class group extends Controller
         $this->hht_response_execute();
     }
 
+    public function storeRole(Request $request)
+    {
+        $data = $request->input();
+        $groupid = $data['id'];
+        DataGroupRole::where('group_id',$groupid)->delete();
+        if(is_array($data['role']))
+        {
+            foreach($data['role'] as $role_id=>$privs)
+            {
+                $gr = new DataGroupRole();
+                $gr->group_id = $groupid;
+                $gr->role_id = $role_id;
+                $gr->privilege = json_encode($privs);
+                $gr->save();
+            }
+        }
+        $this->hht_alert_ok('info','组角色信息保存成功');
+        $this->hht_response_execute();
+    }
+
     public function getAllGroups()
     {
         $query = DataGroup::where('status',Config::get('hthou.status_normal'));
@@ -223,5 +259,11 @@ class group extends Controller
             $list[] = $tmp;
         }
         return json_encode($list);
+    }
+
+    public function getGroupRoleAndPrivilege($id)
+    {
+        $data = DataGroupRole::where('group_id',$id)->get()->toJson();
+        return $data;
     }
 }

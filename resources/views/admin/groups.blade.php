@@ -75,6 +75,14 @@
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                         组权限
                                     </a>
+                                    <a class="btn btn-info role_mod" id="role_{{$r->id}}" href="javascript:void(0);">
+                                        <i class="glyphicon glyphicon-edit icon-white"></i>
+                                        组角色
+                                    </a>
+                                    <a class="btn btn-info" href="{{$url}}/member/{{$r->id}}/?forward={{$mk_forward}}">
+                                        <i class="glyphicon glyphicon-edit icon-white"></i>
+                                        组成员
+                                    </a>
                                     <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
                                         <i class="glyphicon glyphicon-edit icon-white"></i>
                                         修改
@@ -170,6 +178,56 @@
             </div>
         </div>
 <!--组权限结束-->
+
+<!--组角色-->
+        <div class="modal fade" id="myRoleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{$url}}/role" name="add_form" method="post"
+                          onsubmit="return r_submit(this)">
+                        <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
+                        <input type="hidden" name="id" id="role_id" value="">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h3>修改组角色</h3>
+                        </div>
+                        <div class="modal-body" id="role_area">
+                            <div class="box-content">
+
+                                <div id="myTabContent" class="tab-content role_content">
+                                    @foreach($roles as $role)
+                                        <div class="col-md-12">
+                                            <label>{{$role->name}}&nbsp;</label>
+                                            <input type="radio" class="myset" checked value="0" name="role_set_{{$role->id}}">默认权限&nbsp;&nbsp;
+                                            <input type="radio" class="myset" value="1" name="role_set_{{$role->id}}">自定义权限
+                                            <div class="col-md-12 displaynone role_priv">
+                                                @foreach($priv_list as $priv)
+                                                    <label class="col-md-12">{{$priv['type_info']}}</label>
+                                                    <div class="col-md-12">
+                                                        @foreach($priv['data'] as $p)
+                                                            <input type="checkbox" name="role[{{$role->id}}][]" value="{{$p['code']}}">{{$p['name']}}&nbsp;
+                                                        @endforeach
+                                                    </div>
+
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                            <input type="submit" value="提交" class="btn btn-primary">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+<!--组角色结束-->
         <div class="modal fade" id="mydialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true">
 
@@ -353,6 +411,49 @@
 
                 $('#myPrivModal').modal('show');
 
+            });
+            /**
+             * 组角色
+             */
+            $(".role_mod").click(function(e) {
+                e.preventDefault();
+                $('#role_area').find("[type='checkbox']").prop("checked",false);
+                $('.role_priv').hide();
+                $(".myset[value='0']").prop("checked",true);
+                $(".myset[value='1']").prop("checked",false);
+
+                var id_str = $(this).attr('id');
+                var id = id_str.replace('role_','');
+                $('#role_id').val(id);
+                $.get(type_url+'roles/'+id,function(result_res){
+                    var mydata = JSON.parse(result_res);
+                    var mypriv;
+                    for(var i=0;i<mydata.length;i++)
+                    {
+                        if($("[name='role_set_"+mydata[i].role_id+"'][value='1']").attr('checked')!=true)
+                        {
+                            $("[name='role_set_"+mydata[i].role_id+"'][value='1']").prop("checked",true);
+                            $("[name='role_set_"+mydata[i].role_id+"'][value='1']").siblings(".role_priv").show();
+                        }
+                        mypriv = JSON.parse(mydata[i].privilege);
+                        for(var j=0;j<mypriv.length;j++)
+                        {
+                            $("[name='role["+mydata[i].role_id+"][]'][value='"+mypriv[j]+"']").prop("checked",true);
+                        }
+                    }
+                });
+                $('#myRoleModal').modal('show');
+            });
+            $(".myset").click(function(e){
+                var data_area = $(this).siblings(".role_priv");
+                if($(this).val()=='0')
+                {
+                    data_area.hide();
+                }
+                else
+                {
+                    data_area.show();
+                }
             });
         });
     </script>
