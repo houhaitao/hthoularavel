@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\admin;
 
 use App\model\DataGroup;
+use App\model\DataGroupManagerRole;
 use App\model\DataGroupResource;
+use App\model\DataGroupManager;
 use App\model\DataGroupRole;
+use App\model\DataManager;
 use App\model\DataRole;
 use App\model\DataType;
 use App\model\DataPrivilege;
@@ -29,7 +32,7 @@ class group extends Controller
     public function index(Request $request)
     {
         $data = $request->input();
-        $name = isset($data['name']) ? $data['name'] : '';
+        $name = isset($data['name']) ? urldecode($data['name']) : '';
         $pagesize = 20;
 
         $query = DataGroup::where('status',Config::get('hthou.status_normal'));
@@ -49,6 +52,73 @@ class group extends Controller
     public function getMembers($id,Request $request)
     {
         $forward = GlobalTools::get_forward();
+        $data = $request->input();
+        $mkforward = $data['forward'];
+        $name = isset($data['u']) ? $data['u'] : '';
+        $query = DataGroupManager::where('group_id',$id);
+        if(!empty($name))
+        {
+            $user = DataManager::where('username',$name)->first();
+            if(isset($user->id))
+            {
+                $uid = $user->id;
+            }
+            else
+            {
+                $uid = 0;
+            }
+            $query->where('manager_id',$uid);
+        }
+
+        $res =  $query->orderBy('id','desc')->paginate(50);
+        $roles = DataRole::where('status',Config::get('hthou.status_normal'))->get();
+        return view('admin.group_members',['mkforward'=>$mkforward,'roles'=>$roles,'name'=>$name,'forward'=>$forward,'groupid'=>$id,'data'=>$res,'url'=>$this->url]);
+    }
+
+    public function searchmember(Request $request)
+    {
+
+        $data = $request->input();
+        if(!isset($data['name']) || empty($data['name']))
+        {
+            $this->hht_alert('search_message','danger','请填写用户名');
+            $this->hht_response_execute();
+        }
+        $url = $this->url.'/member/'.$data['groupid'].'/?forward='.$data['mkforward'].'&u='.urlencode($data['name']);
+        $this->hht_redirect($url);
+        $this->hht_response_execute();
+    }
+
+    public function getGroupMemberRole($groupid,$managerid)
+    {
+        $res = DataGroupManagerRole::where('group_id',$groupid)->where('manager_id',$managerid)->get();
+        $list = array();
+        foreach($res as $r)
+        {
+            $list[] = $r['role_id'];
+        }
+        return json_encode($list);
+    }
+
+    public function storeGroupMemberRole(Request $request)
+    {
+        $data = $request->input();
+        $groupid = $data['groupid'];
+        $managerid = $data['managerid'];
+        DataGroupManagerRole::where('group_id',$groupid)->where('manager_id',$managerid)->delete();
+        if(isset($data['roles']))
+        {
+            foreach($data['roles'] as $role_id)
+            {
+                $gmr = new DataGroupManagerRole();
+                $gmr->manager_id = $managerid;
+                $gmr->role_id = $role_id;
+                $gmr->group_id = $groupid;
+                $gmr->save();
+            }
+        }
+        $this->hht_alert_ok('info','组成员角色信息成功');
+        $this->hht_response_execute();
 
     }
 

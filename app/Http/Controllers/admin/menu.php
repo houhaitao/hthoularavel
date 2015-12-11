@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\model\DataMenu;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 class menu extends Controller
@@ -22,6 +23,7 @@ class menu extends Controller
     }
     public function index(Request $request)
     {
+        $info = Session::get("manager");
         $data = $request->input();
         $pid = isset($data['pid']) ? $data['pid'] : 0;
         $name = isset($data['name']) ? $data['name'] : '';
@@ -35,7 +37,6 @@ class menu extends Controller
         {
             $backid=0;
         }
-        $ab->test();
         $pid = intval($pid);
         $query = DataMenu::where('parentid',$pid);
         $query->where('status',Config::get("hthou.status_normal"));

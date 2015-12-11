@@ -10,6 +10,7 @@ use App\model\DataManager;
 use App\model\DataGroup;
 use App\model\DataRole;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
 
 class manager extends Controller
 {
@@ -224,6 +225,41 @@ class manager extends Controller
         $data = $request->input();
         $url = $this->hht_make_search_url($data,'name');
         $this->hht_redirect($url);
+        $this->hht_response_execute();
+    }
+
+    public function login_form()
+    {
+        return view('admin.manager_login');
+    }
+
+    public function do_login(Request $request)
+    {
+        $data = $request->input();
+        if(empty($data['username']))
+        {
+            $this->hht_alert('message','danger','请输入用户名');
+            $this->hht_response_execute();
+        }
+        if(empty($data['password']))
+        {
+            $this->hht_alert('message','danger','请输入密码');
+            $this->hht_response_execute();
+        }
+        $manager_db = new DataManager();
+        $info = $manager_db->getUserByUsername($data['username']);
+        if(!isset($info->id))
+        {
+            $this->hht_alert('message','danger','该用户不存在');
+            $this->hht_response_execute();
+        }
+        if($info->password != $manager_db->password_encode($data['password']))
+        {
+            $this->hht_alert('message','danger','密码不正确');
+            $this->hht_response_execute();
+        }
+        Session::put('manager',$info);
+        $this->hht_redirect('/admin/menu/');
         $this->hht_response_execute();
     }
 }

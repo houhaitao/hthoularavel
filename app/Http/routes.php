@@ -15,9 +15,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 /**
+ * 管理员登陆相关
+ */
+Route::get('manager/login','admin\manager@login_form');
+Route::post('manager/dologin','admin\manager@do_login');
+/**
  * 后台管理
  */
-Route::group(['prefix'=>'admin'],function(){
+Route::group(['prefix'=>'admin','middleware'=>'checklogin'],function(){
     /**
      * 菜单管理
      */
@@ -97,7 +102,10 @@ Route::group(['prefix'=>'admin'],function(){
         Route::post('listorder','admin\group@listorder');
         Route::post('priv','admin\group@storePriv');
         Route::post('role','admin\group@storeRole');
+        Route::post('groupmemberrole','admin\group@storeGroupMemberRole');
+        Route::post('searchmember','admin\group@searchmember');
         Route::get('roles/{id}','admin\group@getGroupRoleAndPrivilege')->where('id','[0-9]+');
+        Route::get('groupmeberrole/{groupid}/{managerid}','admin\group@getGroupMemberRole')->where('groupid','[0-9]+')->where('managerid','[0-9]+');
     });
     /**
      * 角色管理
