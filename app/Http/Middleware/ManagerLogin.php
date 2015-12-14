@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Requests\Request;
 use Closure;
 use Illuminate\Support\Facades\Session;
 
@@ -16,7 +17,7 @@ class ManagerLogin
      */
     public function handle($request, Closure $next)
     {
-        $info = Session::get('manager');
+        $info = $request->session()->get('manager');
         if(!isset($info->id) || $info->id <=0)
         {
             return redirect('/manager/login/');

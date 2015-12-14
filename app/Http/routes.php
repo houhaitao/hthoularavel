@@ -121,6 +121,15 @@ Route::group(['prefix'=>'admin','middleware'=>'checklogin'],function(){
         Route::post('storepriv','admin\role@privStore');
     });
 
+    /**
+     * 角色管理
+     */
+
+    Route::group(['prefix'=>'bgserver'],function(){
+        Route::resource('/','admin\bigdata\server');
+
+    });
+
 });
 
 

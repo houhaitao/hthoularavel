@@ -258,7 +258,8 @@ class manager extends Controller
             $this->hht_alert('message','danger','密码不正确');
             $this->hht_response_execute();
         }
-        Session::put('manager',$info);
+        $request->session()->put('manager',$info);
+        $request->session()->save();
         $this->hht_redirect('/admin/menu/');
         $this->hht_response_execute();
     }
