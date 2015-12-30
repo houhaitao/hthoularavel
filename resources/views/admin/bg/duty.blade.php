@@ -1,12 +1,12 @@
 @extends('admin.main')
-@section('title','ÁªÑÁÆ°ÁêÜ')
+@section('title','»ŒŒÒπ‹¿Ì')
 @section('content')
     <div class="row">
 
         <div class="box col-md-12">
             <div class="box-inner">
                 <div class="box-header well" data-original-title="">
-                    <h2><i class="glyphicon glyphicon-edit"></i> ÊêúÁ¥¢</h2>
+                    <h2><i class="glyphicon glyphicon-edit"></i> À—À˜</h2>
 
                     <div class="box-icon">
 
@@ -18,7 +18,7 @@
                     <form role="form" method="post" action="{{$url}}/search" onsubmit="return r_submit(this)">
                         <div class="col-md-12">
                             <div class="form-group col-md-4">
-                                <input type="text" name="name" value="{{$name}}" class="form-control" id="exampleInputEmail1" placeholder="ÁªÑÂêçÁß∞" />
+                                <input type="text" name="dutyname" value="{{$name}}" class="form-control" id="exampleInputEmail1" placeholder="»ŒŒÒ√˚≥∆" />
 
                                 <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                             </div>
@@ -43,7 +43,7 @@
         <div class="box col-md-12">
             <div class="box-inner">
                 <div class="box-header well" data-original-title="">
-                    <h2><i class="glyphicon glyphicon-user"></i> ÁªÑÁÆ°ÁêÜ</h2>
+                    <h2><i class="glyphicon glyphicon-user"></i> »ŒŒÒπ‹¿Ì</h2>
 
                     <div class="box-icon">
 
@@ -58,37 +58,41 @@
                         <table class="table table-striped table-bordered">
                             <thead>
                             <tr>
-                                <th><input type="checkbox" id="checkall" children="ck"/></th>
-                                <th>ÊéíÂ∫è</th>
-                                <th>ÁªÑÂêçÁß∞</th>
-                                <th>Êìç‰Ωú</th>
+                                <th>»ŒŒÒ√˚≥∆</th>
+                                <th>»ŒŒÒ¿‡–Õº∞∑Ω∑®</th>
+                                <th>»ŒŒÒ∑∂Œß</th>
+                                <th>÷¥––º∆ªÆ</th>
+                                <th>ÃÌº” ±º‰</th>
+                                <th>≤Ÿ◊˜</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($data as $r)
-                            <tr>
-                                <td><input type="checkbox" name="id[]" class="ck" value="{{$r->id}}"/></td>
-                                <td><input size="4" name="listorder[{{$r->id}}]" value="{{$r->listorder}}" type="text"/></td>
-                                <td>{{$r->group_name}}</td>
-                                <td class="center">
-                                    <a class="btn btn-info priv_mod" id="priv_{{$r->id}}" href="javascript:void(0);">
-                                        <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        ÁªÑÊùÉÈôê
-                                    </a>
-                                    <a class="btn btn-info role_mod" id="role_{{$r->id}}" href="javascript:void(0);">
-                                        <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        ÁªÑËßíËâ≤
-                                    </a>
-                                    <a class="btn btn-info" href="{{$url}}/member/{{$r->id}}/?forward={{$mk_forward}}">
-                                        <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        ÁªÑÊàêÂëò
-                                    </a>
-                                    <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
-                                        <i class="glyphicon glyphicon-edit icon-white"></i>
-                                        ‰øÆÊîπ
-                                    </a>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>{{$r->duty_name}}</td>
+                                    <td>{{$type_list[$r->type]}}--{{$type_list[$r->duty_action]}}</td>
+                                    <td>@if($r->duty_roles['types']=='roles')
+                                            @foreach($r->duty_roles)
+                                            {{$r->group_name}}</td>
+                                    <td class="center">
+                                        <a class="btn btn-info priv_mod" id="priv_{{$r->id}}" href="javascript:void(0);">
+                                            <i class="glyphicon glyphicon-edit icon-white"></i>
+                                            ◊È»®œﬁ
+                                        </a>
+                                        <a class="btn btn-info role_mod" id="role_{{$r->id}}" href="javascript:void(0);">
+                                            <i class="glyphicon glyphicon-edit icon-white"></i>
+                                            ◊ÈΩ«…´
+                                        </a>
+                                        <a class="btn btn-info" href="{{$url}}/member/{{$r->id}}/?forward={{$mk_forward}}">
+                                            <i class="glyphicon glyphicon-edit icon-white"></i>
+                                            ◊È≥…‘±
+                                        </a>
+                                        <a class="btn btn-info data_mod" id="mod_{{$r->id}}" href="javascript:void(0);">
+                                            <i class="glyphicon glyphicon-edit icon-white"></i>
+                                            –ﬁ∏ƒ
+                                        </a>
+                                    </td>
+                                </tr>
                             @endforeach
 
 
@@ -97,9 +101,9 @@
                         <div>
                             <div class="col-md-4">
                                 <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
-                                <input type="button" onclick="change_opt('form1','{{$url}}/delete')" class="btn btn-danger" value="Âà†Èô§"/>&nbsp;
-                                <input type="button" onclick="change_opt('form1','{{$url}}/listorder')" class="btn btn-default" value="ÊéíÂ∫è"/>&nbsp;
-                                <input type="button" id="op_add_form" class="btn btn-success" value="Ê∑ªÂä†"/>
+                                <input type="button" onclick="change_opt('form1','{{$url}}/delete')" class="btn btn-danger" value="…æ≥˝"/>&nbsp;
+                                <input type="button" onclick="change_opt('form1','{{$url}}/listorder')" class="btn btn-default" value="≈≈–Ú"/>&nbsp;
+                                <input type="button" id="op_add_form" class="btn btn-success" value="ÃÌº”"/>
                             </div>
                             <div class="col-md-8 no-padding no-margin myright">
                                 {!! $data->render() !!}
@@ -118,32 +122,32 @@
                     <form action="{{$url}}" name="add_form" method="post"
                           onsubmit="return r_submit(this)">
                         <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">√ó</button>
-                        <h3>Ê∑ªÂä†ÁªÑ‰ø°ÊÅØ</h3>
-                    </div>
-                    <div class="modal-body">
-                        <div id="add_message" class="alert alert-info displaynone"></div>
-                        <div class="form-group col-md-12 typecode">
-                            <input type="text" class="form-control" id="form_name" name="name"
-                                   placeholder="ÁªÑÂêçÁß∞">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">°¡</button>
+                            <h3>ÃÌº”◊È–≈œ¢</h3>
                         </div>
+                        <div class="modal-body">
+                            <div id="add_message" class="alert alert-info displaynone"></div>
+                            <div class="form-group col-md-12 typecode">
+                                <input type="text" class="form-control" id="form_name" name="name"
+                                       placeholder="◊È√˚≥∆">
+                            </div>
 
-                        <div class="form-group col-md-12">
-                            <textarea name="description" class="form-control" id="form_description" rows="5" placeholder="ÊèèËø∞‰ø°ÊÅØ"></textarea>
+                            <div class="form-group col-md-12">
+                                <textarea name="description" class="form-control" id="form_description" rows="5" placeholder="√Ë ˆ–≈œ¢"></textarea>
 
+                            </div>
+                            <div class="clear"></div>
                         </div>
-                        <div class="clear"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
-                        <input type="submit" value="Êèê‰∫§" class="btn btn-primary">
-                    </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                            <input type="submit" value="Ã·Ωª" class="btn btn-primary">
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-<!--ÁªÑÊùÉÈôê-->
+        <!--◊È»®œﬁ-->
         <div class="modal fade" id="myPrivModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true">
 
@@ -154,8 +158,8 @@
                         <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                         <input type="hidden" name="id" id="priv_id" value="">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">√ó</button>
-                            <h3>‰øÆÊîπÁªÑÊùÉÈôê</h3>
+                            <button type="button" class="close" data-dismiss="modal">°¡</button>
+                            <h3>–ﬁ∏ƒ◊È»®œﬁ</h3>
                         </div>
                         <div class="modal-body" id="priv_area">
                             <div class="box-content">
@@ -171,15 +175,15 @@
                         </div>
                         <div class="modal-footer">
                             <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
-                            <input type="submit" value="Êèê‰∫§" class="btn btn-primary">
+                            <input type="submit" value="Ã·Ωª" class="btn btn-primary">
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-<!--ÁªÑÊùÉÈôêÁªìÊùü-->
+        <!--◊È»®œﬁΩ· ¯-->
 
-<!--ÁªÑËßíËâ≤-->
+        <!--◊ÈΩ«…´-->
         <div class="modal fade" id="myRoleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true">
 
@@ -190,8 +194,8 @@
                         <input type="hidden" name="_token"  value="{{csrf_token()}}"/>
                         <input type="hidden" name="id" id="role_id" value="">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">√ó</button>
-                            <h3>‰øÆÊîπÁªÑËßíËâ≤</h3>
+                            <button type="button" class="close" data-dismiss="modal">°¡</button>
+                            <h3>–ﬁ∏ƒ◊ÈΩ«…´</h3>
                         </div>
                         <div class="modal-body" id="role_area">
                             <div class="box-content">
@@ -200,8 +204,8 @@
                                     @foreach($roles as $role)
                                         <div class="col-md-12">
                                             <label>{{$role->name}}&nbsp;</label>
-                                            <input type="radio" class="myset" checked value="0" name="role_set_{{$role->id}}">ÈªòËÆ§ÊùÉÈôê&nbsp;&nbsp;
-                                            <input type="radio" class="myset" value="1" name="role_set_{{$role->id}}">Ëá™ÂÆö‰πâÊùÉÈôê
+                                            <input type="radio" class="myset" checked value="0" name="role_set_{{$role->id}}">ƒ¨»œ»®œﬁ&nbsp;&nbsp;
+                                            <input type="radio" class="myset" value="1" name="role_set_{{$role->id}}">◊‘∂®“Â»®œﬁ
                                             <div class="col-md-12 displaynone role_priv">
                                                 @foreach($priv_list as $priv)
                                                     <label class="col-md-12">{{$priv['type_info']}}</label>
@@ -221,13 +225,13 @@
                         </div>
                         <div class="modal-footer">
                             <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
-                            <input type="submit" value="Êèê‰∫§" class="btn btn-primary">
+                            <input type="submit" value="Ã·Ωª" class="btn btn-primary">
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-<!--ÁªÑËßíËâ≤ÁªìÊùü-->
+        <!--◊ÈΩ«…´Ω· ¯-->
         <div class="modal fade" id="mydialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
              aria-hidden="true">
 
@@ -235,14 +239,14 @@
                 <div class="modal-content">
 
 
-                        <div class="modal-body">
-                            <div id="my_dd" class="alert alert-info"></div>
+                    <div class="modal-body">
+                        <div id="my_dd" class="alert alert-info"></div>
 
-                            <div class="clear"></div>
-                        </div>
-                        <div class="modal-footer">
-                            <input type="button" onclick="self.location=self.location" id="button" value="Á°ÆÂÆö" class="btn btn-primary">
-                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" onclick="self.location=self.location" id="button" value="»∑∂®" class="btn btn-primary">
+                    </div>
                 </div>
             </div>
         </div>
@@ -260,7 +264,7 @@
             var i=0;
             var html = '<div class="hht-tree">';
             var myinfo;
-            var mylevelmore = false; //Êú¨Â±ÇÁ∫ß‰∏ãÊòØÂê¶ÊúâËäÇÁÇπÊúâÂ≠êËäÇÁÇπ
+            var mylevelmore = false; //±æ≤„º∂œ¬ «∑Ò”–Ω⁄µ„”–◊”Ω⁄µ„
             for(i=0;i<len;i++)
             {
                 myinfo = data[i];
@@ -270,7 +274,7 @@
                 }
 
             }
-            //Â¶ÇÊûúÂùáÊ≤°ÊúâÂ≠êËäÇÁÇπ
+            //»Áπ˚æ˘√ª”–◊”Ω⁄µ„
             if(mylevelmore === false)
             {
                 for(i=0;i<len;i++)
@@ -316,7 +320,7 @@
         }
         $(document).ready(function () {
             /**
-             * ÂàÜÁ±ªÁÆ°ÁêÜ
+             * ∑÷¿‡π‹¿Ì
              */
             $("#op_add_form").click(function(e){
                 e.preventDefault();
@@ -355,7 +359,7 @@
             });
 
             /**
-             * ÁªÑÊùÉÈôê
+             * ◊È»®œﬁ
              */
             $(".priv_mod").click(function(e){
                 e.preventDefault();
@@ -413,7 +417,7 @@
 
             });
             /**
-             * ÁªÑËßíËâ≤
+             * ◊ÈΩ«…´
              */
             $(".role_mod").click(function(e) {
                 e.preventDefault();

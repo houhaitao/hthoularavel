@@ -12,3 +12,8 @@ define('STATUS_WAIT',3);//待审
 define('STATUS_RECOVER',3);//回收站还原后内容的状态
 define('STATUS_RECYCLE',98); //进入回收站状态
 define('STATUS_NORMAL',99);//终审发布
+define('HADOOP_ROLE_NAME_NODE_ACTIVE','1');
+define('HADOOP_ROLE_NAME_NODE_BACKUP','3');
+define('HADOOP_ROLE_DATA_NODE','2');
+define('HADOOP_HOST_NAME','hd1');
+define('HADOOP_ROLE',','.HADOOP_ROLE_NAME_NODE.',');

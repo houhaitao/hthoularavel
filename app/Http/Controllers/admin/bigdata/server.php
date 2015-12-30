@@ -10,7 +10,8 @@ use App\Http\Controllers\Controller;
 class server extends Controller
 {
     private $role_list = array(
-        '1'     =>  'namenode',
+        '1'     =>  'namenode-active',
+        '3'     =>  'namenode-backup',
         '2'     =>  'datanode'
     );
     public function __construct()
@@ -108,5 +109,15 @@ class server extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function mkNormal(Request $request)
+    {
+        $data = $request->input();
+        $id = $data['id'];
+        $server_info = BgServer::find($id);
+        $server_info->status=2;
+        $server_info->save();
+        return '1';
     }
 }

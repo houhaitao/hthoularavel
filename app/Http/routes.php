@@ -122,12 +122,21 @@ Route::group(['prefix'=>'admin','middleware'=>'checklogin'],function(){
     });
 
     /**
-     * 角色管理
+     * 节点管理
      */
 
     Route::group(['prefix'=>'bgserver'],function(){
         Route::resource('/','admin\bigdata\server');
+        Route::get('mknormal','admin\bigdata\server@mkNormal');
+    });
 
+    /**
+     * 服务端信息管理
+     */
+
+    Route::group(['prefix'=>'bgbaseinfo'],function(){
+        Route::resource('/','admin\bigdata\baseinfo');
+        Route::post('delete','admin\bigdata\baseinfo@delete');
     });
 
 });

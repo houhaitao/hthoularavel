@@ -82,7 +82,7 @@
                                     <td>@if($r->status==1)初始化@elseif($r->status==2)正常运行@elseif($r->status==3)已停用@else故障@endif</td>
                                     <td class="center">
                                         @if($r->status==1)
-                                        <a class="btn btn-info priv_mod" href="javascript:void(0);">
+                                        <a class="btn btn-info zc_mod" id="zc_{{$r->id}}" href="javascript:void(0);">
                                             <i class="glyphicon glyphicon-edit icon-white"></i>
                                             确认正常
                                         </a>
@@ -116,6 +116,19 @@
 
         <!-- content ends -->
     </div><!--/#content.col-md-0-->
-
+    <script>
+        var type_url = '/admin/bgserver/';
+        $(document).ready(function () {
+            $(".zc_mod").click(function(){
+                var id_str = $(this).attr('id');
+                var id = id_str.replace('zc_','');
+                var url = type_url+"mknormal/?id="+id;
+                $.get(url, function(result){
+                    alert('操作成功');
+                    self.location = self.location;
+                });
+            });
+        });
+    </script>
 
 @endsection
